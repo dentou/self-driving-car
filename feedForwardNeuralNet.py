@@ -21,10 +21,14 @@ class Network(object):
         """
         The list sizes contain sizes for each layer in neural net
         The list weights contain weights for all layers in NN, flattened
-        Bias is randomized according to normal distribution
+                with biases in front
         """
         self.num_layers = len(sizes)
-        self.biases = [np.random.randn(y, 1) for y in sizes[1:]] 
+        self.sizes = sizes
+        self.biases = []
+        for i in sizes[1:]:
+            self.biases.append(np.array(weights[:i]).reshape(i, 1))
+            weights = weights[i:]
         
         self.weights = []
         for i in (self.num_layers-1):
