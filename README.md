@@ -20,3 +20,4 @@
 
 ### Learning algorithm
 
+* [ ] Fitness calculation
