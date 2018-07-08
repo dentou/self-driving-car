@@ -112,6 +112,7 @@ def readSensor(rect, foods):
 		for food in foods:
 			if isPointInsideRect(ssright, rect.centery, food):
 				sensors['right'] = ssright - rect.right
+				flag = True
 				break
 		if flag:
 			flag = False
@@ -124,6 +125,7 @@ def readSensor(rect, foods):
 		for food in foods:
 			if isPointInsideRect(rect.centerx, sstop, food):
 				sensors['top'] = rect.top - sstop
+				flag = True
 				break
 		if flag:
 			flag = False
@@ -136,6 +138,7 @@ def readSensor(rect, foods):
 		for food in foods:
 			if isPointInsideRect(rect.centerx, ssbot, food):
 				sensors['bottom'] = ssbot - rect.bottom
+				flag = True
 				break
 		if flag:
 			flag = False
