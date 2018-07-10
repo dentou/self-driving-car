@@ -68,6 +68,7 @@ class Car:
 		if self.is_braking:
 			if self.acceleration * self.speed > 0:
 				self.speed = 0
+				self.acceleration = 0
 				self.is_braking = False
 
 
