@@ -3,7 +3,7 @@ Utilities
 Author: dentou
 """
 
-from model.Point import Point
+from Point import Point
 from pygame.math import Vector2
 from math import sin, cos, pi
 
