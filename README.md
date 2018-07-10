@@ -5,18 +5,23 @@
 ### Modelling
 
 * [ ] Car
-    * [ ] Position
-    * [ ] Velocity
+    * [x] Position
+    * [x] Velocity
+    * [x] Acceleration and braking
+    * [x] Turning
+    * [ ] Customizable model
 * [ ] Sensor
     * [ ] Range
     * [ ] Field of view
     * [ ] Resolution
 * [ ] Track
+    * [x] Track center line
+    * [x] Track border lines
     * [ ] Customizable
 
 ### Simulation
 
-* [ ] Collision 
+* [ ] Collision detection
 
 ### Learning algorithm
 
