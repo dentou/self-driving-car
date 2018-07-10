@@ -18,6 +18,7 @@
     * [x] Track center line
     * [x] Track border lines
     * [ ] Customizable
+    * [ ] Checkpoints
 
 ### Simulation
 
@@ -25,4 +26,4 @@
 
 ### Learning algorithm
 
-* [ ] Fitness calculation
+* [ ] Fitness calculation (checkpoints count)
