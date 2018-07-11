@@ -21,6 +21,12 @@ class Car:
 	def draw(self, surface, color):
 		pygame.draw.polygon(surface, color, self.model.get_point_list())
 
+	def reset(self, position=(0, 0), size=(50, 100), speed=0, acceleration=0):
+		self.model = Model(position[0], position[1], size[0], size[1])
+		self.speed = speed
+		self.acceleration = acceleration
+		self.direction = Vector2(0, -1).normalize()
+
 	def accelerate(self, value):
 		"""
 		Set acceleration of the car
