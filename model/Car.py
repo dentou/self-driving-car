@@ -5,7 +5,7 @@ Author: dentou
 
 import pygame
 from pygame.math import Vector2
-from model.Point import Point
+from Point import Point
 from utils.Utils import *
 
 

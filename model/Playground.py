@@ -5,7 +5,7 @@ Author: dentou
 
 import pygame
 import sys
-from model.Car import Car
+from Car import Car
 
 # set up pygame
 pygame.init()
@@ -24,10 +24,12 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
 
-
+# Set speed parameters
+ACCELERATION = 100
+TURNSPEED = 30
 
 # Setup car
-car = Car((300, 300))
+car = Car(position = (300, 300), size = (100,100))
 
 # Set up movement variables.
 moveUp = False
@@ -74,14 +76,14 @@ while True:
 
 	# Move the car
 	if moveUp:
-		car.accelerate(100)
+		car.accelerate(ACCELERATION)
 	if moveDown:
-		car.accelerate(-100)
+		car.accelerate(-ACCELERATION)
 	if car.is_moving():
 		if moveLeft:
-			car.turn(30/FPS) # 30 degrees per second
+			car.turn(TURNSPEED/FPS) # 30 degrees per second
 		elif moveRight:
-			car.turn(-30/FPS)
+			car.turn(-TURNSPEED/FPS)
 		if (not moveUp) and (not moveDown) and car.is_moving():
 			car.brake()
 
