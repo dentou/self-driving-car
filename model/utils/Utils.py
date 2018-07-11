@@ -4,9 +4,9 @@ Author: dentou
 """
 
 from Point import Point
+import pygame
 from pygame.math import Vector2
 from math import sin, cos, pi
-
 
 def rotate_point(point, pivot, angle):
 	"""
@@ -43,3 +43,12 @@ def rotate_vector(vector, angle):
 
 	return Vector2(new_vx, new_vy)
 
+
+def isPointInsideRect(x, y, rect):
+	"""
+	Detect if point is inside Rect
+	"""
+	if (x > rect.left) and (x < rect.right) and (y > rect.top) and (y < rect.bottom):
+		return True
+	else:
+		return False
