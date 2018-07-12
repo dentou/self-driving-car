@@ -32,9 +32,9 @@
 
 ### Pygame tutorial
 
-https://inventwithpython.com/invent4thed/chapter17.html : Basic introduction with useful methods.
+* https://inventwithpython.com/invent4thed/chapter17.html : Basic introduction with useful methods.
 
 ### Machine learning
 
-http://neuralnetworksanddeeplearning.com/ : Comprehensive introduction to Neural Networks and Deep Learning by Michael Nielsen, with python codes.
-https://unity3d.com/machine-learning : Unity Machine Learning
+* http://neuralnetworksanddeeplearning.com/ : Comprehensive introduction to Neural Networks and Deep Learning by Michael Nielsen, with python codes.
+* https://unity3d.com/machine-learning : Unity Machine Learning
