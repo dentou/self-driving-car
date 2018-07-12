@@ -15,6 +15,7 @@
     * [ ] Field of view
     * [ ] Resolution
 * [ ] Track
+    * [x] Simple orthogonal track model w/ checkpoints
     * [x] Track center line
     * [x] Track border lines
     * [ ] Customizable
