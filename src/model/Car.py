@@ -5,26 +5,38 @@ Author: dentou
 
 import pygame, sys
 from pygame.math import Vector2
+from pygame.locals import *
 from Point import Point
 from utils.Utils import *
 
 
 class Car:
+	"""
+	Parameters:
+		direction: # Direction of movement (generally not the same as vector from back to front - the car may move backward)
+		velocity: scalar velocity w.r.t direction
+		acceleration: scalar acceleration w.r.t to direction
+	"""
 
-	def __init__(self, position=(0, 0), size=(50, 100), speed=0, acceleration=0):
+	DEFAULT_BRAKING_ACCELERATION = 100
+	DRAG_COEFF = 1.33 # unit: 1/sec; settling time = 4 / DRAG_COEFF =  3 sec
+
+	def __init__(self, position=(0, 0), size=(50, 100), velocity=0, acceleration=0):
 		self.direction = Vector2(0, -1).normalize()
-		self.speed = speed
+		self.velocity = velocity
 		self.acceleration = acceleration
+		self.totalAcceleration = acceleration
 		self.model = Model(position[0], position[1], size[0], size[1])
 		self.isBraking = False
 
 	def draw(self, surface, color):
 		pygame.draw.polygon(surface, color, self.model.getPointList())
 
-	def reset(self, position=(0, 0), size=(50, 100), speed=0, acceleration=0):
+	def reset(self, position=(0, 0), size=(50, 100), velocity=0, acceleration=0):
 		self.model = Model(position[0], position[1], size[0], size[1])
-		self.speed = speed
+		self.velocity = velocity
 		self.acceleration = acceleration
+		self.totalAcceleration = acceleration
 		self.direction = Vector2(0, -1).normalize()
 
 	def accelerate(self, value):
@@ -35,23 +47,29 @@ class Car:
 		self.isBraking = False
 		self.acceleration = value
 
-	def brake(self, value=100):
+	def brake(self, value=DEFAULT_BRAKING_ACCELERATION):
 		"""
 		Brake the car by applying counter acceleration
 		:param value: magnitude of acceleration
 		"""
+		if not self.isMoving():
+			pass
+
 		self.isBraking = True
-		if self.speed > 0:
-			self.acceleration = -value
-		else:
-			self.acceleration = value
+		if self.velocity > 0:
+			self.accelerate(-value)
+		elif self.velocity < 0:
+			self.accelerate(value)
+
+	def unbrake(self):
+		self.accelerate(0)
 
 	def isMoving(self):
 		"""
 		Check if car is moving
 		:return: boolean
 		"""
-		return self.speed != 0
+		return self.velocity != 0
 
 	def turn(self, angle):
 		"""
@@ -59,23 +77,31 @@ class Car:
 		:param angle: in degrees, positive means counter-clockwise rotation
 		"""
 		# Rotate direction vector
-		self.direction = rotate_vector(self.direction, angle)
+		self.direction = rotateVector(self.direction, angle)
 		# Rotate car model
 		self.model.rotate(angle)
 
-	def update(self, time_interval):
+	def update(self, timeInterval):
 		"""
 		Update car parameters
-		:param time_interval: in seconds
+		:param timeInterval: in seconds
 		"""
-		displacement = self.direction * (self.speed * time_interval + 0.5 * self.acceleration * time_interval ** 2)
+		# Calculate total acceleration
+		dragAcceleration = -self.DRAG_COEFF * self.velocity
+		self.totalAcceleration = self.acceleration + dragAcceleration
+
+		displacement = self.direction * (self.velocity * timeInterval + 0.5 * self.totalAcceleration * timeInterval ** 2)
 		self.model.move(displacement.x, displacement.y)
-		self.speed += self.acceleration * time_interval
+		self.velocity += self.totalAcceleration * timeInterval
+
 		if self.isBraking:
-			if self.acceleration * self.speed > 0:
-				self.speed = 0
+			if self.acceleration * self.velocity > 0:
+				self.velocity = 0
 				self.acceleration = 0
 				self.isBraking = False
+
+		if abs(self.velocity) < sys.float_info.epsilon:
+			self.velocity = 0
 
 
 class Model:
@@ -110,15 +136,15 @@ class Model:
 		return center_x, center_y
 
 	def rotate(self, angle):
-		new_top_left = rotate_point(self.topLeft, Point(*self.getCenter()), angle)
-		new_top_right = rotate_point(self.topRight, Point(*self.getCenter()), angle)
-		new_bottom_left = rotate_point(self.bottomLeft, Point(*self.getCenter()), angle)
-		new_bottom_right = rotate_point(self.bottomRight, Point(*self.getCenter()), angle)
+		newTopLeft = rotatePoint(self.topLeft, Point(*self.getCenter()), angle)
+		newTopRight = rotatePoint(self.topRight, Point(*self.getCenter()), angle)
+		newBottomLeft = rotatePoint(self.bottomLeft, Point(*self.getCenter()), angle)
+		newBottomRight = rotatePoint(self.bottomRight, Point(*self.getCenter()), angle)
 
-		self.topLeft = new_top_left
-		self.topRight = new_top_right
-		self.bottomLeft = new_bottom_left
-		self.bottomRight = new_bottom_right
+		self.topLeft = newTopLeft
+		self.topRight = newTopRight
+		self.bottomLeft = newBottomLeft
+		self.bottomRight = newBottomRight
 
 
 def main():
@@ -144,9 +170,10 @@ def main():
 	WHITE = (255, 255, 255)
 
 	# Set speed parameters
-	ACCELERATION = 100
-	BRAKE = 100
-	TURNSPEED = 30
+	ACCELERATION = 100 # pixels per second squared
+					# final speed will be ACCELERATION / DRAG_COEFF
+	BRAKING_ACCELERATION = 300
+	TURN_SPEED = 45 # degrees per second
 
 	# Setup car
 	x0 = 300
@@ -164,7 +191,8 @@ def main():
 	moveLeft = False
 	moveRight = False
 
-	MOVE_SPEED = 4
+	brake = False
+
 
 	while True:
 		for event in pygame.event.get():
@@ -185,6 +213,9 @@ def main():
 				if event.key == pygame.K_DOWN or event.key == pygame.K_s:
 					moveUp = False
 					moveDown = True
+				if event.key == pygame.K_SPACE:
+					brake = True
+
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_ESCAPE:
 					pygame.quit()
@@ -197,19 +228,28 @@ def main():
 					moveUp = False
 				if event.key == pygame.K_DOWN or event.key == pygame.K_s:
 					moveDown = False
+				if event.key == pygame.K_SPACE:
+					brake = False
+
+
 
 		# Move the car
-		if moveUp:
-			car.accelerate(ACCELERATION)
-		if moveDown:
-			car.accelerate(-ACCELERATION)
-		if car.isMoving():
-			if moveLeft:
-				car.turn(TURNSPEED / FPS)  # 30 degrees per second
-			elif moveRight:
-				car.turn(-TURNSPEED / FPS)
-			if (not moveUp) and (not moveDown) and car.isMoving():
-				car.brake(BRAKE)
+		if brake:
+			car.brake(BRAKING_ACCELERATION)
+		else:
+			if moveUp:
+				car.accelerate(ACCELERATION)
+			if moveDown:
+				car.accelerate(-ACCELERATION)
+			if car.isMoving():
+				if moveLeft:
+					car.turn(TURN_SPEED / FPS)
+				elif moveRight:
+					car.turn(-TURN_SPEED / FPS)
+				if (not moveUp) and (not moveDown) and car.isMoving():
+					#car.brake(BRAKING_ACCELERATION)
+					car.accelerate(0)
+					pass
 
 		car.update(1 / FPS)
 
@@ -235,6 +275,39 @@ def main():
 
 		# Draw car
 		car.draw(windowSurface, BLACK)
+
+		# Set up fonts.
+		basicFont = pygame.font.SysFont(None, 24)
+
+		# Setup information text
+		TEXT_X0 = WINDOW_WIDTH - 275
+		TEXT_Y0 = 10
+		TEXT_VGAP = 15
+		# Position
+		posText = basicFont.render(
+			"(x,y) = ({0:.0f},{1:.0f})".format(car.model.getCenter()[0], car.model.getCenter()[1]), True, BLACK)
+		posRect = posText.get_rect()
+		posRect.topleft = (TEXT_X0, TEXT_Y0)
+		# Velocity
+		velText = basicFont.render("velocity = {0:.0f} pixels/s".format(car.velocity), True, BLACK)
+		velRect = velText.get_rect()
+		velRect.topleft = (TEXT_X0, TEXT_Y0 + TEXT_VGAP)
+		# Acceleration
+		accText = basicFont.render("acceleration = {0:.0f} pixels/s^2".format(car.acceleration), True, BLACK)
+		accRect = accText.get_rect()
+		accRect.topleft = (TEXT_X0, TEXT_Y0 + 2 * TEXT_VGAP)
+		# Total Acceleration
+		totAccText = basicFont.render("total acceleration = {0:.0f} pixels/s^2".format(car.totalAcceleration), True, BLACK)
+		totAccRect = totAccText.get_rect()
+		totAccRect.topleft = (TEXT_X0, TEXT_Y0 + 3 * TEXT_VGAP)
+
+
+		# Display car parameters
+		windowSurface.blit(posText, posRect)
+		windowSurface.blit(velText, velRect)
+		windowSurface.blit(accText, accRect)
+		windowSurface.blit(totAccText, totAccRect)
+
 
 		# Draw the window onto the screen.
 		pygame.display.update()
