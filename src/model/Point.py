@@ -11,7 +11,7 @@ class Point:
 		self.x = x_init
 		self.y = y_init
 
-	def as_tuple(self):
+	def asTuple(self):
 		return self.x, self.y
 
 	def shift(self, x, y):

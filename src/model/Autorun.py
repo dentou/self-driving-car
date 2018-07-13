@@ -82,12 +82,12 @@ while True:
 		car.accelerate(acce.value)
 	if moveDown:
 		car.accelerate(-acce.value)
-	if car.is_moving():
+	if car.isMoving():
 		if moveLeft:
 			car.turn(tusp.value/FPS) # 30 degrees per second
 		elif moveRight:
 			car.turn(tusp.value/FPS)
-		if (not moveUp) and (not moveDown) and car.is_moving():
+		if (not moveUp) and (not moveDown) and car.isMoving():
 			car.brake(BRAKE)
 
 	car.update(1/FPS)

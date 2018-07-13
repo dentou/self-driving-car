@@ -6,13 +6,14 @@ Some code from inventwithpython
 import pygame, sys, random
 from pygame.locals import *
 
+
 def doRectsOverlap(rect1, rect2):
 	"""
 	Detect if the two rectangle overlap
 	"""
 	for a, b in [(rect1, rect2), (rect2, rect1)]:
 		if isPointInsideRect(a.left, a.top, b):
-			print('({},{})'.format(a.left, a.top)) #print position of collision
+			print('({},{})'.format(a.left, a.top))  # print position of collision
 			return True
 		elif isPointInsideRect(a.left, a.bottom, b):
 			print('({},{})'.format(a.left, a.bottom))
@@ -26,6 +27,7 @@ def doRectsOverlap(rect1, rect2):
 
 	return False
 
+
 def isPointInsideRect(x, y, rect):
 	"""
 	Detect if point is inside Rect
@@ -34,7 +36,8 @@ def isPointInsideRect(x, y, rect):
 		return True
 	else:
 		return False
-		
+
+
 # set up pygame
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -61,8 +64,8 @@ MOVESPEED = 4
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
-RED   = (255, 0, 0)
-BLUE  = (0, 0, 255)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
 # set up the bouncer and food data structures
 foodCounter = 0
@@ -70,16 +73,16 @@ foodCounter = 0
 NEWFOOD = 15
 FOODSIZE = 20
 SENSORRANGE = 200
-SENSORRESOLUTION = 1 #incremental step of sensor reading, must divide SENSORRANGE
+SENSORRESOLUTION = 1  # incremental step of sensor reading, must divide SENSORRANGE
 SENSORSIZE = 5
 RAYSIZE = 1
-bouncer = {'rect':pygame.Rect(300, 100, 50, 50), 'dir':random.choice([DOWN, UP, LEFT, RIGHT])}
+bouncer = {'rect': pygame.Rect(300, 100, 50, 50), 'dir': random.choice([DOWN, UP, LEFT, RIGHT])}
 foods = []
 for i in range(20):
 	foods.append(pygame.Rect(random.randint(0, WINDOWWIDTH - FOODSIZE), \
-			random.randint(0, WINDOWHEIGHT - FOODSIZE), FOODSIZE, FOODSIZE))
+							 random.randint(0, WINDOWHEIGHT - FOODSIZE), FOODSIZE, FOODSIZE))
 
-			
+
 def readSensor(rect, foods):
 	"""
 	Output sensors as a dictionary of four sensors indexed 'left','right','top','bottom'
@@ -90,12 +93,12 @@ def readSensor(rect, foods):
 	Increment by resolution until it detects a piece of food
 	Cannot detect wall (simply return SENSORRANGE)
 	"""
-	sensors = {'left':SENSORRANGE, 'right':SENSORRANGE, 'top':SENSORRANGE, 'bottom':SENSORRANGE}
+	sensors = {'left': SENSORRANGE, 'right': SENSORRANGE, 'top': SENSORRANGE, 'bottom': SENSORRANGE}
 	flag = False
-	
-	#Left sensor
-	ssleft = rect.left #x-coordinate
-	while (rect.left - ssleft) < SENSORRANGE: #do not run at range SENSORRANGE
+
+	# Left sensor
+	ssleft = rect.left  # x-coordinate
+	while (rect.left - ssleft) < SENSORRANGE:  # do not run at range SENSORRANGE
 		for food in foods:
 			if isPointInsideRect(ssleft, rect.centery, food):
 				sensors['left'] = rect.left - ssleft
@@ -105,9 +108,9 @@ def readSensor(rect, foods):
 			flag = False
 			break
 		ssleft -= SENSORRESOLUTION
-				
-	#Right sensor
-	ssright = rect.right #x-coordinate
+
+	# Right sensor
+	ssright = rect.right  # x-coordinate
 	while (ssright - rect.right) < SENSORRANGE:
 		for food in foods:
 			if isPointInsideRect(ssright, rect.centery, food):
@@ -118,9 +121,9 @@ def readSensor(rect, foods):
 			flag = False
 			break
 		ssright += SENSORRESOLUTION
-		
-	#Top sensor
-	sstop = rect.top #y-coordinate
+
+	# Top sensor
+	sstop = rect.top  # y-coordinate
 	while (rect.top - sstop) < SENSORRANGE:
 		for food in foods:
 			if isPointInsideRect(rect.centerx, sstop, food):
@@ -131,9 +134,9 @@ def readSensor(rect, foods):
 			flag = False
 			break
 		sstop -= SENSORRESOLUTION
-		
-	#Bottom sensor
-	ssbot = rect.bottom #y-coordinate
+
+	# Bottom sensor
+	ssbot = rect.bottom  # y-coordinate
 	while (ssbot - rect.bottom) < SENSORRANGE:
 		for food in foods:
 			if isPointInsideRect(rect.centerx, ssbot, food):
@@ -144,9 +147,10 @@ def readSensor(rect, foods):
 			flag = False
 			break
 		ssbot += SENSORRESOLUTION
-		
+
 	return sensors
-			
+
+
 # run the game loop
 while True:
 	# check for the QUIT event
@@ -159,15 +163,17 @@ while True:
 	if foodCounter >= NEWFOOD:
 		# add new food after a period of time
 		foodCounter = 0
-		foods.append(pygame.Rect(random.randint(0, WINDOWWIDTH - FOODSIZE), random.randint(0, WINDOWHEIGHT - FOODSIZE), FOODSIZE, FOODSIZE))
+		foods.append(
+			pygame.Rect(random.randint(0, WINDOWWIDTH - FOODSIZE), random.randint(0, WINDOWHEIGHT - FOODSIZE), FOODSIZE,
+						FOODSIZE))
 
 	# draw the black background onto the surface
 	windowSurface.fill(BLACK)
-	
+
 	# change direction when no food is eaten after a period of time
 	# if eatCounter >= 500:
-		# bouncer['dir'] = random.choice([DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT])
-		# eatCounter = 0
+	# bouncer['dir'] = random.choice([DOWNLEFT, DOWNRIGHT, UPLEFT, UPRIGHT])
+	# eatCounter = 0
 
 	# move the bouncer data structure
 	if bouncer['dir'] == DOWNLEFT:
@@ -224,8 +230,6 @@ while True:
 			bouncer['dir'] = UPLEFT
 		if bouncer['dir'] == RIGHT:
 			bouncer['dir'] = LEFT
-			
-	
 
 	# draw the bouncer onto the surface
 	pygame.draw.rect(windowSurface, WHITE, bouncer['rect'])
@@ -235,12 +239,12 @@ while True:
 		if doRectsOverlap(bouncer['rect'], food):
 			print('Collision detected')
 			foods.remove(food)
-	
-	#read sensors
+
+	# read sensors
 	sensors = readSensor(bouncer['rect'], foods)
-	
-	#change dir base on closest sensors, if no sensors work then keep dir
-	#need improvement
+
+	# change dir base on closest sensors, if no sensors work then keep dir
+	# need improvement
 	if (sensors['left'] < sensors['right']):
 		if (sensors['top'] < sensors['bottom']) and (sensors['top'] < sensors['left']):
 			bouncer['dir'] = UP
@@ -259,36 +263,38 @@ while True:
 		bouncer['dir'] = UP
 	elif (sensors['bottom'] < sensors['top']):
 		bouncer['dir'] = DOWN
-	
+
 	# draw the food
 	for i in range(len(foods)):
 		pygame.draw.rect(windowSurface, GREEN, foods[i])
-		
+
 	# draw the sensor and sensor ray
 	if sensors['left'] < SENSORRANGE:
-		pygame.draw.circle(windowSurface, RED, (bouncer['rect'].left-sensors['left'],
-					bouncer['rect'].centery), SENSORSIZE, 0)
-		pygame.draw.line(windowSurface, BLUE, (bouncer['rect'].left-sensors['left'],
-					bouncer['rect'].centery), (bouncer['rect'].left, bouncer['rect'].centery),
-					RAYSIZE)
+		pygame.draw.circle(windowSurface, RED, (bouncer['rect'].left - sensors['left'],
+												bouncer['rect'].centery), SENSORSIZE, 0)
+		pygame.draw.line(windowSurface, BLUE, (bouncer['rect'].left - sensors['left'],
+											   bouncer['rect'].centery),
+						 (bouncer['rect'].left, bouncer['rect'].centery),
+						 RAYSIZE)
 	if sensors['right'] < SENSORRANGE:
-		pygame.draw.circle(windowSurface, RED, (bouncer['rect'].right+sensors['right'],
-					bouncer['rect'].centery), SENSORSIZE, 0)
-		pygame.draw.line(windowSurface, BLUE, (bouncer['rect'].right+sensors['right'],
-					bouncer['rect'].centery), (bouncer['rect'].right, bouncer['rect'].centery),
-					RAYSIZE)
+		pygame.draw.circle(windowSurface, RED, (bouncer['rect'].right + sensors['right'],
+												bouncer['rect'].centery), SENSORSIZE, 0)
+		pygame.draw.line(windowSurface, BLUE, (bouncer['rect'].right + sensors['right'],
+											   bouncer['rect'].centery),
+						 (bouncer['rect'].right, bouncer['rect'].centery),
+						 RAYSIZE)
 	if sensors['top'] < SENSORRANGE:
 		pygame.draw.circle(windowSurface, RED, (bouncer['rect'].centerx,
-					bouncer['rect'].top-sensors['top']), SENSORSIZE, 0)
+												bouncer['rect'].top - sensors['top']), SENSORSIZE, 0)
 		pygame.draw.line(windowSurface, BLUE, (bouncer['rect'].centerx,
-					bouncer['rect'].top-sensors['top']),
-					(bouncer['rect'].centerx, bouncer['rect'].top), RAYSIZE)
+											   bouncer['rect'].top - sensors['top']),
+						 (bouncer['rect'].centerx, bouncer['rect'].top), RAYSIZE)
 	if sensors['bottom'] < SENSORRANGE:
 		pygame.draw.circle(windowSurface, RED, (bouncer['rect'].centerx,
-					bouncer['rect'].bottom+sensors['bottom']), SENSORSIZE, 0)
+												bouncer['rect'].bottom + sensors['bottom']), SENSORSIZE, 0)
 		pygame.draw.line(windowSurface, BLUE, (bouncer['rect'].centerx,
-					bouncer['rect'].bottom+sensors['bottom']),
-					(bouncer['rect'].centerx, bouncer['rect'].bottom), RAYSIZE)
+											   bouncer['rect'].bottom + sensors['bottom']),
+						 (bouncer['rect'].centerx, bouncer['rect'].bottom), RAYSIZE)
 
 	# draw the window onto the screen
 	pygame.display.update()

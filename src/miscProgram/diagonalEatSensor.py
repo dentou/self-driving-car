@@ -237,7 +237,7 @@ while True:
 			bouncer['dir'] = UPLEFT
 		elif bouncer['dir'] == DOWNRIGHT:
 			bouncer['dir'] = DOWNLEFT
-    elif (sensors['right'] < sensors['left']):
+	elif (sensors['right'] < sensors['left']):
 		if (sensors['top'] < sensors['bottom']):
 			bouncer['dir'] = UPRIGHT
 		elif (sensors['bottom'] < sensors['top']):

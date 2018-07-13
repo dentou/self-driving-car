@@ -16,10 +16,10 @@ class Car:
 		self.speed = speed
 		self.acceleration = acceleration
 		self.model = Model(position[0], position[1], size[0], size[1])
-		self.is_braking = False
+		self.isBraking = False
 
 	def draw(self, surface, color):
-		pygame.draw.polygon(surface, color, self.model.get_point_list())
+		pygame.draw.polygon(surface, color, self.model.getPointList())
 
 	def reset(self, position=(0, 0), size=(50, 100), speed=0, acceleration=0):
 		self.model = Model(position[0], position[1], size[0], size[1])
@@ -32,7 +32,7 @@ class Car:
 		Set acceleration of the car
 		:param value: acceleration
 		"""
-		self.is_braking = False
+		self.isBraking = False
 		self.acceleration = value
 
 	def brake(self, value=100):
@@ -40,13 +40,13 @@ class Car:
 		Brake the car by applying counter acceleration
 		:param value: magnitude of acceleration
 		"""
-		self.is_braking = True
+		self.isBraking = True
 		if self.speed > 0:
 			self.acceleration = -value
 		else:
 			self.acceleration = value
 
-	def is_moving(self):
+	def isMoving(self):
 		"""
 		Check if car is moving
 		:return: boolean
@@ -71,11 +71,11 @@ class Car:
 		displacement = self.direction * (self.speed * time_interval + 0.5 * self.acceleration * time_interval ** 2)
 		self.model.move(displacement.x, displacement.y)
 		self.speed += self.acceleration * time_interval
-		if self.is_braking:
+		if self.isBraking:
 			if self.acceleration * self.speed > 0:
 				self.speed = 0
 				self.acceleration = 0
-				self.is_braking = False
+				self.isBraking = False
 
 
 class Model:
@@ -83,42 +83,43 @@ class Model:
 	Model of the car as a rectangle
 	"""
 	def __init__(self, left, top, width, height):
-		self.top_left = Point(left, top)
-		self.top_right = Point(left + width, top)
-		self.bottom_left = Point(left, top + height)
-		self.bottom_right = Point(left + width, top + height)
+		self.topLeft = Point(left, top)
+		self.topRight = Point(left + width, top)
+		self.bottomLeft = Point(left, top + height)
+		self.bottomRight = Point(left + width, top + height)
 
-	def get_point_list(self):
+	def getPointList(self):
 		"""
 		:return: list of points as tuples
 		"""
-		return [self.top_left.as_tuple(), self.top_right.as_tuple(), self.bottom_right.as_tuple(),
-				self.bottom_left.as_tuple()]
+		return [self.topLeft.asTuple(), self.topRight.asTuple(), self.bottomRight.asTuple(),
+				self.bottomLeft.asTuple()]
 
 	def move(self, dx, dy):
 		"""
 		Shift model
 		"""
-		self.top_left.shift(dx, dy)
-		self.top_right.shift(dx, dy)
-		self.bottom_left.shift(dx, dy)
-		self.bottom_right.shift(dx, dy)
+		self.topLeft.shift(dx, dy)
+		self.topRight.shift(dx, dy)
+		self.bottomLeft.shift(dx, dy)
+		self.bottomRight.shift(dx, dy)
 
-	def get_center(self):
-		center_x = (self.top_left.x + self.bottom_right.x) / 2
-		center_y = (self.top_left.y + self.bottom_right.y) / 2
+	def getCenter(self):
+		center_x = (self.topLeft.x + self.bottomRight.x) / 2
+		center_y = (self.topLeft.y + self.bottomRight.y) / 2
 		return center_x, center_y
 
 	def rotate(self, angle):
-		new_top_left = rotate_point(self.top_left, Point(*self.get_center()), angle)
-		new_top_right = rotate_point(self.top_right, Point(*self.get_center()), angle)
-		new_bottom_left = rotate_point(self.bottom_left, Point(*self.get_center()), angle)
-		new_bottom_right = rotate_point(self.bottom_right, Point(*self.get_center()), angle)
+		new_top_left = rotate_point(self.topLeft, Point(*self.getCenter()), angle)
+		new_top_right = rotate_point(self.topRight, Point(*self.getCenter()), angle)
+		new_bottom_left = rotate_point(self.bottomLeft, Point(*self.getCenter()), angle)
+		new_bottom_right = rotate_point(self.bottomRight, Point(*self.getCenter()), angle)
 
-		self.top_left = new_top_left
-		self.top_right = new_top_right
-		self.bottom_left = new_bottom_left
-		self.bottom_right = new_bottom_right
+		self.topLeft = new_top_left
+		self.topRight = new_top_right
+		self.bottomLeft = new_bottom_left
+		self.bottomRight = new_bottom_right
+
 
 def main():
 	"""
@@ -132,9 +133,9 @@ def main():
 	FPS = 60
 
 	# set up the window
-	WINDOWWIDTH = 600
-	WINDOWHEIGHT = 600
-	windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
+	WINDOW_WIDTH = 600
+	WINDOW_HEIGHT = 600
+	windowSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 	pygame.display.set_caption('Car test')
 
 	# Set up the colors.
@@ -150,12 +151,12 @@ def main():
 	# Setup car
 	x0 = 300
 	y0 = 300
-	CARWIDTH = 20
-	CARHEIGHT = 40
-	car = Car(position=(x0, y0), size=(CARWIDTH, CARHEIGHT))
+	CAR_WIDTH = 20
+	CAR_HEIGHT = 40
+	car = Car(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 	# Choose whether to set car when going out of window
-	CARRESET = True
+	CAR_RESET = True
 
 	# Set up movement variables.
 	moveUp = False
@@ -163,7 +164,7 @@ def main():
 	moveLeft = False
 	moveRight = False
 
-	MOVESPEED = 4
+	MOVE_SPEED = 4
 
 	while True:
 		for event in pygame.event.get():
@@ -202,29 +203,29 @@ def main():
 			car.accelerate(ACCELERATION)
 		if moveDown:
 			car.accelerate(-ACCELERATION)
-		if car.is_moving():
+		if car.isMoving():
 			if moveLeft:
 				car.turn(TURNSPEED / FPS)  # 30 degrees per second
 			elif moveRight:
 				car.turn(-TURNSPEED / FPS)
-			if (not moveUp) and (not moveDown) and car.is_moving():
+			if (not moveUp) and (not moveDown) and car.isMoving():
 				car.brake(BRAKE)
 
 		car.update(1 / FPS)
 
 		# If car goes out of window, reset
-		if CARRESET:
-			if ((car.model.top_left.x < 0) or (car.model.top_right.x < 0) or (car.model.bottom_left.x < 0) or (
-					car.model.bottom_right.x < 0) or
-					(car.model.top_left.x > WINDOWWIDTH) or (car.model.top_right.x > WINDOWWIDTH) or (
-							car.model.bottom_left.x > WINDOWWIDTH) or
-					(car.model.bottom_right.x > WINDOWWIDTH) or
-					(car.model.top_left.y < 0) or (car.model.top_right.y < 0) or (car.model.bottom_left.y < 0) or (
-							car.model.bottom_right.y < 0) or
-					(car.model.top_left.y > WINDOWHEIGHT) or (car.model.top_right.y > WINDOWHEIGHT) or (
-							car.model.bottom_left.y > WINDOWHEIGHT) or
-					(car.model.bottom_right.y > WINDOWHEIGHT)):
-				car.reset(position=(x0, y0), size=(CARWIDTH, CARHEIGHT))
+		if CAR_RESET:
+			if ((car.model.topLeft.x < 0) or (car.model.topRight.x < 0) or (car.model.bottomLeft.x < 0) or (
+					car.model.bottomRight.x < 0) or
+					(car.model.topLeft.x > WINDOW_WIDTH) or (car.model.topRight.x > WINDOW_WIDTH) or (
+							car.model.bottomLeft.x > WINDOW_WIDTH) or
+					(car.model.bottomRight.x > WINDOW_WIDTH) or
+					(car.model.topLeft.y < 0) or (car.model.topRight.y < 0) or (car.model.bottomLeft.y < 0) or (
+							car.model.bottomRight.y < 0) or
+					(car.model.topLeft.y > WINDOW_HEIGHT) or (car.model.topRight.y > WINDOW_HEIGHT) or (
+							car.model.bottomLeft.y > WINDOW_HEIGHT) or
+					(car.model.bottomRight.y > WINDOW_HEIGHT)):
+				car.reset(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 		# Draw the white background onto the surface.
 		windowSurface.fill(WHITE)
