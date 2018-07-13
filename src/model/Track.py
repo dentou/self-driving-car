@@ -11,7 +11,7 @@ import math
 from math import sqrt, cos, sin
 
 
-def draw_line_with_circles(screen, color, start, end, thickness):
+def drawLineWithCircles(screen, color, start, end, thickness):
 	"""
 	Draw line by combining adjacent circles
 	Adapted from https://nerdparadise.com/programming/pygame/part6
@@ -34,7 +34,7 @@ def draw_line_with_circles(screen, color, start, end, thickness):
 		pygame.draw.circle(screen, color, (x, y), thickness)
 
 
-def draw_segment(screen, color, start, end, width=100, center_thickness=3, border_thickness=10):
+def drawSegment(screen, color, start, end, width=100, center_thickness=3, border_thickness=10):
 	"""
 	Draw track segment
 	:param screen:
@@ -58,16 +58,16 @@ def draw_segment(screen, color, start, end, width=100, center_thickness=3, borde
 	left_start = (round(start[0] + perp_vector[0] * width / 2), round(start[1] + perp_vector[1] * width / 2))
 	left_end = (round(end[0] + perp_vector[0] * width / 2), round(end[1] + perp_vector[1] * width / 2))
 	# pygame.draw.lines(screen, color, False, [leftStart, leftEnd], borderThickness)
-	draw_line_with_circles(screen, color, left_start, left_end, border_thickness)
+	drawLineWithCircles(screen, color, left_start, left_end, border_thickness)
 
 	# Draw "right" border line
 	right_start = (round(start[0] - perp_vector[0] * width / 2), round(start[1] - perp_vector[1] * width / 2))
 	right_end = (round(end[0] - perp_vector[0] * width / 2), round(end[1] - perp_vector[1] * width / 2))
 	# pygame.draw.lines(screen, color, False, [rightStart, rightEnd], borderThickness)
-	draw_line_with_circles(screen, color, right_start, right_end, border_thickness)
+	drawLineWithCircles(screen, color, right_start, right_end, border_thickness)
 
 
-def draw_track(screen, color, point_list):
+def drawTrack(screen, color, point_list):
 	"""
 	Draw track
 	:param screen:
@@ -76,7 +76,7 @@ def draw_track(screen, color, point_list):
 	:return:
 	"""
 	for index, point in enumerate(point_list[:-1]):
-		draw_segment(screen, color, point, point_list[index + 1])
+		drawSegment(screen, color, point, point_list[index + 1])
 
 
 if __name__ == "__main__":
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 		y = 300 + 100*sin(angle * math.pi / 180)
 		pointList.append((x, y))
 
-	draw_track(screen, BLACK, pointList)
+	drawTrack(screen, BLACK, pointList)
 
 	pygame.display.update()
 

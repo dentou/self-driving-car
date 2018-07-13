@@ -8,7 +8,7 @@ import pygame
 from pygame.math import Vector2
 from math import sin, cos, pi
 
-def rotate_point(point, pivot, angle):
+def rotatePoint(point, pivot, angle):
 	"""
 	Return rotated point around pivot (the old point is not rotated)
 	:param point: point to be rotated (won't be changed)
@@ -18,7 +18,7 @@ def rotate_point(point, pivot, angle):
 	"""
 
 	vector = Vector2(point.x - pivot.x, point.y - pivot.y)
-	rotated_vector = rotate_vector(vector, angle)
+	rotated_vector = rotateVector(vector, angle)
 
 	px = rotated_vector.x + pivot.x
 	py = rotated_vector.y + pivot.y
@@ -26,7 +26,7 @@ def rotate_point(point, pivot, angle):
 	return Point(px, py)
 
 
-def rotate_vector(vector, angle):
+def rotateVector(vector, angle):
 	"""
 	:param vector: vector to be rotated (won't be changed)
 	:param angle: in degrees, positive means counter-clockwise rotation
