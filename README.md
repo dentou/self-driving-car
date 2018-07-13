@@ -9,7 +9,7 @@
     * [x] Velocity
     * [x] Acceleration and braking
     * [x] Turning
-    * [ ] Impedance
+    * [ ] Friction
     * [ ] Camera moving with chosen car
     * [ ] Customizable model
 * [ ] Sensor
