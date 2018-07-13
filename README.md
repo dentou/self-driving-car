@@ -9,6 +9,8 @@
     * [x] Velocity
     * [x] Acceleration and braking
     * [x] Turning
+    * [ ] Impedance
+    * [ ] Camera moving with chosen car
     * [ ] Customizable model
 * [ ] Sensor
     * [ ] Range
@@ -34,6 +36,10 @@
 ### Pygame tutorial
 
 * https://inventwithpython.com/invent4thed/chapter17.html : Basic introduction with useful methods.
+
+### Python libraries
+
+* [pybox2d](https://github.com/pybox2d/pybox2d): 2D Game Physics
 
 ### Machine learning
 
