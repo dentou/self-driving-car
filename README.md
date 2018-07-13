@@ -9,7 +9,7 @@
     * [x] Velocity
     * [x] Acceleration and braking
     * [x] Turning
-    * [ ] Friction
+    * [x] Drag
     * [ ] Camera moving with chosen car
     * [ ] Customizable model
 * [ ] Sensor

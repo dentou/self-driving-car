@@ -15,11 +15,13 @@ class Car:
 	Parameters:
 		direction: # Direction of movement (generally not the same as vector from back to front - the car may move backward)
 		velocity: scalar velocity w.r.t direction
-		acceleration: scalar acceleration w.r.t to direction
+		acceleration: applied scalar acceleration w.r.t to direction
+		totalAcceleration: = acceleration + drag
 	"""
 
 	DEFAULT_BRAKING_ACCELERATION = 100
 	DRAG_COEFF = 1.33 # unit: 1/sec; settling time = 4 / DRAG_COEFF =  3 sec
+	VELOCITY_THRESHOLD = 0.1 # if velocity < threshold then the car will not move
 
 	def __init__(self, position=(0, 0), size=(50, 100), velocity=0, acceleration=0):
 		self.direction = Vector2(0, -1).normalize()
@@ -95,12 +97,12 @@ class Car:
 		self.velocity += self.totalAcceleration * timeInterval
 
 		if self.isBraking:
-			if self.acceleration * self.velocity > 0:
+			if self.totalAcceleration * self.velocity > 0:
 				self.velocity = 0
-				self.acceleration = 0
+				self.totalAcceleration = 0
 				self.isBraking = False
 
-		if abs(self.velocity) < sys.float_info.epsilon:
+		if abs(self.velocity) < self.VELOCITY_THRESHOLD:
 			self.velocity = 0
 
 
@@ -168,6 +170,7 @@ def main():
 	BLACK = (0, 0, 0)
 	GREEN = (0, 255, 0)
 	WHITE = (255, 255, 255)
+	RED = (255, 0, 0)
 
 	# Set speed parameters
 	ACCELERATION = 100 # pixels per second squared
@@ -300,7 +303,12 @@ def main():
 		totAccText = basicFont.render("total acceleration = {0:.0f} pixels/s^2".format(car.totalAcceleration), True, BLACK)
 		totAccRect = totAccText.get_rect()
 		totAccRect.topleft = (TEXT_X0, TEXT_Y0 + 3 * TEXT_VGAP)
-
+		# Stop notification
+		if not car.isMoving():
+			stopText = basicFont.render("Stopped", True, RED)
+			stopRect = stopText.get_rect()
+			stopRect.topleft = (TEXT_X0, TEXT_Y0 + 4 * TEXT_VGAP)
+			windowSurface.blit(stopText, stopRect)
 
 		# Display car parameters
 		windowSurface.blit(posText, posRect)
