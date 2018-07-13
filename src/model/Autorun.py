@@ -88,18 +88,18 @@ while True:
 		elif moveRight:
 			car.turn(tusp.value/FPS)
 		if (not moveUp) and (not moveDown) and car.isMoving():
-			car.brake(BRAKE)
+			pass
 
 	car.update(1/FPS)
 
 	# If car goes out of window, reset
 	if CARRESET:
-		if ((car.model.top_left.x < 0) or (car.model.top_right.x < 0) or (car.model.bottom_left.x < 0) or (car.model.bottom_right.x < 0) or 
-			(car.model.top_left.x > WINDOWWIDTH) or (car.model.top_right.x > WINDOWWIDTH) or (car.model.bottom_left.x > WINDOWWIDTH) or 
-			(car.model.bottom_right.x > WINDOWWIDTH) or 
-			(car.model.top_left.y < 0) or (car.model.top_right.y < 0) or (car.model.bottom_left.y < 0) or (car.model.bottom_right.y < 0) or 
-			(car.model.top_left.y > WINDOWHEIGHT) or (car.model.top_right.y > WINDOWHEIGHT) or (car.model.bottom_left.y > WINDOWHEIGHT) or 
-			(car.model.bottom_right.y > WINDOWHEIGHT)):
+		if ((car.model.topLeft.x < 0) or (car.model.topRight.x < 0) or (car.model.bottomLeft.x < 0) or (car.model.bottomRight.x < 0) or
+			(car.model.topLeft.x > WINDOWWIDTH) or (car.model.topRight.x > WINDOWWIDTH) or (car.model.bottomLeft.x > WINDOWWIDTH) or
+			(car.model.bottomRight.x > WINDOWWIDTH) or
+			(car.model.topLeft.y < 0) or (car.model.topRight.y < 0) or (car.model.bottomLeft.y < 0) or (car.model.bottomRight.y < 0) or
+			(car.model.topLeft.y > WINDOWHEIGHT) or (car.model.topRight.y > WINDOWHEIGHT) or (car.model.bottomLeft.y > WINDOWHEIGHT) or
+			(car.model.bottomRight.y > WINDOWHEIGHT)):
 			car.reset(position = (x0, y0), size = (CARWIDTH, CARHEIGHT))
 
 	# Draw the white background onto the surface.
