@@ -21,7 +21,7 @@ class Car:
 
 	DEFAULT_BRAKING_ACCELERATION = 100
 	DRAG_COEFF = 1.33 # unit: 1/sec; settling time = 4 / DRAG_COEFF =  3 sec
-	VELOCITY_THRESHOLD = 0.1 # if velocity < threshold then the car will not move
+	VELOCITY_THRESHOLD = 0.5 # if velocity < threshold then the car will not move
 
 	def __init__(self, position=(0, 0), size=(50, 100), velocity=0, acceleration=0):
 		self.direction = Vector2(0, -1).normalize()
