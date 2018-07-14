@@ -14,6 +14,8 @@ RIGHT = 6
 #parameters
 WALLWIDTH = 3
 CHECKPOINTWIDTH = 1
+CHECKPOINTHITBOX = 3
+CHECKPOINTSTEP = 5
 
 class OrthogonalTrack(object):
     def __init__(self, checkpointlist, X0, Y0):
@@ -34,32 +36,66 @@ class OrthogonalTrack(object):
         """
         self.walls = processCpsList(X0, Y0, checkpointlist)
         self.checkpoints = []
+        self.checkpointshitbox = []
         for cp in checkpointlist:
-            cprect, wall1, wall2 = createCheckPoint(cp)
+            cprect, cprecthitbox, wall1, wall2 = createCheckPoint(cp)
+            #cprect, wall1, wall2 = createCheckPoint(cp)
             self.walls.append(wall1)
             self.walls.append(wall2)
-            self.checkpoints.append(cprect)
+            self.checkpoints += cprect
+            self.checkpointshitbox += cprecthitbox
 
 def createCheckPoint(cp):
     #cp is a dictionary with keys 'x', 'y', 'dir', 'w(idth)', 'l(ength)'
+    cprect = []
+    cprecthitbox = []
+    
     if cp['dir'] == DOWN:
-        cprect = pygame.Rect(cp['x'], cp['y'], cp['w'], CHECKPOINTWIDTH)
+        pos = cp['y']
+        while pos < (cp['y'] + cp['l']):
+            cprect.append(pygame.Rect(cp['x'], pos, cp['w'], CHECKPOINTWIDTH))
+            cprecthitbox.append(pygame.Rect(cp['x'], pos, cp['w'], CHECKPOINTHITBOX))
+            pos += CHECKPOINTSTEP
+        #cprect = pygame.Rect(cp['x'], cp['y'], cp['w'], CHECKPOINTWIDTH)
+        #cprecthitbox = pygame.Rect(cp['x'], cp['y'], cp['w'], CHECKPOINTHITBOX)
         wall1 = pygame.Rect(cp['x']-WALLWIDTH, cp['y'], WALLWIDTH, cp['l'])
         wall2 = pygame.Rect(cp['x']+cp['w'], cp['y'], WALLWIDTH, cp['l'])
+    
     elif cp['dir'] == UP:
-        cprect = pygame.Rect(cp['x'], cp['y'], cp['w'], CHECKPOINTWIDTH)
+        pos = cp['y']
+        while pos > (cp['y'] - cp['l']):
+            cprect.append(pygame.Rect(cp['x'], pos, cp['w'], CHECKPOINTWIDTH))
+            cprecthitbox.append(pygame.Rect(cp['x'], pos, cp['w'], CHECKPOINTHITBOX))
+            pos -= CHECKPOINTSTEP
+        #cprect = pygame.Rect(cp['x'], cp['y'], cp['w'], CHECKPOINTWIDTH)
+        #cprecthitbox = pygame.Rect(cp['x'], cp['y'], cp['w'], CHECKPOINTHITBOX)
         wall1 = pygame.Rect(cp['x']-WALLWIDTH, cp['y']-cp['l']+1, WALLWIDTH, cp['l'])
         wall2 = pygame.Rect(cp['x']+cp['w'], cp['y']-cp['l']+1, WALLWIDTH, cp['l'])
+    
     elif cp['dir'] == LEFT:
-        cprect = pygame.Rect(cp['x'], cp['y'], CHECKPOINTWIDTH, cp['w'])
+        pos = cp['x']
+        while pos > (cp['x'] - cp['l']):
+            cprect.append(pygame.Rect(pos, cp['y'], CHECKPOINTWIDTH, cp['w']))
+            cprecthitbox.append(pygame.Rect(pos, cp['y'], CHECKPOINTHITBOX, cp['w']))
+            pos -= CHECKPOINTSTEP
+        #cprect = pygame.Rect(cp['x'], cp['y'], CHECKPOINTWIDTH, cp['w'])
+        #cprecthitbox = pygame.Rect(cp['x'], cp['y'], CHECKPOINTHITBOX, cp['w'])
         wall1 = pygame.Rect(cp['x']-cp['l']+1, cp['y']-WALLWIDTH, cp['l'], WALLWIDTH)
         wall2 = pygame.Rect(cp['x']-cp['l']+1, cp['y']+cp['w'], cp['l'], WALLWIDTH)
-    else:
-        cprect = pygame.Rect(cp['x'], cp['y'], CHECKPOINTWIDTH, cp['w'])
+    
+    else: #cp['dir'] == RIGHT
+        pos = cp['x']
+        while pos < (cp['x'] + cp['l']):
+            cprect.append(pygame.Rect(pos, cp['y'], CHECKPOINTWIDTH, cp['w']))
+            cprecthitbox.append(pygame.Rect(pos, cp['y'], CHECKPOINTHITBOX, cp['w']))
+            pos += CHECKPOINTSTEP
+        #cprect = pygame.Rect(cp['x'], cp['y'], CHECKPOINTWIDTH, cp['w'])
+        #cprecthitbox = pygame.Rect(cp['x'], cp['y'], CHECKPOINTHITBOX, cp['w'])
         wall1 = pygame.Rect(cp['x'], cp['y']-WALLWIDTH, cp['l'], WALLWIDTH)
         wall2 = pygame.Rect(cp['x'], cp['y']+cp['w'], cp['l'], WALLWIDTH)
        
-    return cprect, wall1, wall2
+    return cprect, cprecthitbox, wall1, wall2
+    #return cprect, wall1, wall2
  
 def processCpsList(x, y, cpslist):
     #change the cpslist element, since input a list into function will only input pointer

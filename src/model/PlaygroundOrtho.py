@@ -20,7 +20,7 @@ FPS = 60
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 600
 windowSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
-pygame.display.set_caption('Playground')
+pygame.display.set_caption('Playground Orthogonal Track')
 
 # Set up the colors.
 BLACK  = (0, 0, 0)
@@ -53,6 +53,7 @@ y0_track = 50
 track = OrthogonalTrack(cpslist, x0_track, y0_track)
 # Create new checkpoints list
 currCheckpoints = track.checkpoints[:]
+currCheckpointshitbox = track.checkpointshitbox[:]
 
 # Setup car
 ACCELERATION = 100 # pixels per second squared
@@ -172,20 +173,22 @@ while True:
 		if car.isCollideWithRect(wall):
 			car.reset(position=(x0_car, y0_car), size=(CAR_WIDTH, CAR_HEIGHT)) #reset car to original position
 			currCheckpoints = track.checkpoints[:] #reset checkpoints
+			currCheckpointshitbox = track.checkpointshitbox[:]
 			car.draw(windowSurface, RED) #not working, why?
 			pygame.time.wait(200)
 			break
 
    	# check if car has interested with any checkpoint (may rewrite)
-	for i, cp in enumerate(currCheckpoints[:]):
+	for i, cp in enumerate(currCheckpointshitbox):
 		if car.isCollideWithRect(cp):
 			currCheckpoints.pop(i)
+			currCheckpointshitbox.pop(i)
 
     # Draw walls and checkpoints
 	for i in range(len(track.walls)):
 		pygame.draw.rect(windowSurface, GREEN, track.walls[i])
-	for i in range(len(track.checkpoints)):
-		pygame.draw.rect(windowSurface, BLUE, track.checkpoints[i])
+	for i in range(len(currCheckpoints)):
+		pygame.draw.rect(windowSurface, BLUE, currCheckpoints[i])
 
 
 	# Draw the window onto the screen.
