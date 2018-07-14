@@ -6,7 +6,7 @@ Author: dentou
 from Point import Point
 import pygame
 from pygame.math import Vector2
-from math import sin, cos, pi
+from math import sin, cos, pi, atan2
 
 def rotatePoint(point, pivot, angle):
 	"""
@@ -43,12 +43,27 @@ def rotateVector(vector, angle):
 
 	return Vector2(new_vx, new_vy)
 
+def lengthenVector(vector, length):
+	"""
+	:param vector: vector to be lengthened (won't be changed)
+	:param length: length to be added
+	:return: lengthened vector
+	"""
+	vx = vector.x
+	vy = vector.y
 
-def isPointInsideRect(x, y, rect):
+	alpha = atan2(vy, vx)
+
+	new_vx = vx + length * cos(alpha)
+	new_vy = vy + length * sin(alpha)
+
+	return Vector2(new_vx, new_vy)
+
+def isPointInsideRect(PointA, rect):
 	"""
 	Detect if point is inside Rect
 	"""
-	if (x > rect.left) and (x < rect.right) and (y > rect.top) and (y < rect.bottom):
+	if (PointA.x > rect.left) and (PointA.x < rect.right) and (PointA.y > rect.top) and (PointA.y < rect.bottom):
 		return True
 	else:
 		return False

@@ -15,6 +15,31 @@ RIGHT = 6
 WALLWIDTH = 3
 CHECKPOINTWIDTH = 1
 
+class OrthogonalTrack(object):
+    def __init__(self, checkpointlist, X0, Y0):
+        """
+        Input:  list of track checkpoints, including 'dir', 'w'(idth) and 'l'(ength)
+                X0, Y0: start place
+        Example:
+        cpslist = [ {'dir': RIGHT,  'w': 80, 'l': 200},
+                    {'dir': RIGHT,  'w': 40, 'l': 200},
+                    {'dir': DOWN, 'w': 70, 'l': 160},
+                    {'dir': DOWN, 'w': 35, 'l': 160},
+                    {'dir': LEFT,    'w': 60, 'l': 140},
+                    {'dir': LEFT,    'w': 30, 'l': 140},
+                    {'dir': UP,  'w': 40, 'l': 120},
+                    {'dir': UP,  'w': 20, 'l': 120}]
+
+        Output is self.walls and self.checkpoints, each containing pygame.Rect object
+        """
+        self.walls = processCpsList(X0, Y0, checkpointlist)
+        self.checkpoints = []
+        for cp in checkpointlist:
+            cprect, wall1, wall2 = createCheckPoint(cp)
+            self.walls.append(wall1)
+            self.walls.append(wall2)
+            self.checkpoints.append(cprect)
+
 def createCheckPoint(cp):
     #cp is a dictionary with keys 'x', 'y', 'dir', 'w(idth)', 'l(ength)'
     if cp['dir'] == DOWN:
@@ -35,8 +60,6 @@ def createCheckPoint(cp):
         wall2 = pygame.Rect(cp['x'], cp['y']+cp['w'], cp['l'], WALLWIDTH)
        
     return cprect, wall1, wall2
- 
-#cpslist = [] #containing cp elements but without 'x', 'y' coordinate
  
 def processCpsList(x, y, cpslist):
     #change the cpslist element, since input a list into function will only input pointer
@@ -276,6 +299,9 @@ def main():
                 {'dir': UP,  'w': 40, 'l': 120},
                 {'dir': UP,  'w': 20, 'l': 120}]
 
+    #create track
+    track = OrthogonalTrack(cpslist, X0, Y0)
+
     while True:
         # check for the QUIT event
         for event in pygame.event.get():
@@ -286,20 +312,11 @@ def main():
         # draw the black background onto the surface
         windowSurface.fill(BLACK)           
 
-        # create walls and checkpoints
-        walls = processCpsList(X0, Y0, cpslist)
-        cpsrect = []
-        for cp in cpslist:
-            cprect, wall1, wall2 = createCheckPoint(cp)
-            walls.append(wall1)
-            walls.append(wall2)
-            cpsrect.append(cprect)
-
         # draw walls and checkpoints
-        for i in range(len(walls)):
-            pygame.draw.rect(windowSurface, GREEN, walls[i])
-        for i in range(len(cpsrect)):
-            pygame.draw.rect(windowSurface, BLUE, cpsrect[i])
+        for i in range(len(track.walls)):
+            pygame.draw.rect(windowSurface, GREEN, track.walls[i])
+        for i in range(len(track.checkpoints)):
+            pygame.draw.rect(windowSurface, BLUE, track.checkpoints[i])
 
         pygame.display.update()
 

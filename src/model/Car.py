@@ -1,6 +1,6 @@
 """
 Car model
-Author: dentou
+Author: dentou & npgh2009
 """
 
 import pygame, sys
@@ -86,6 +86,16 @@ class Car:
 		self.direction = rotateVector(self.direction, angle)
 		# Rotate car model
 		self.model.rotate(angle)
+
+	def isCollideWithRect(self, rect):
+		"""
+		Check if car has collided with input pygame.Rect object
+		"""
+		if (isPointInsideRect(self.model.topLeft, rect) or isPointInsideRect(self.model.topRight, rect)
+			or isPointInsideRect(self.model.bottomLeft, rect) or isPointInsideRect(self.model.bottomRight, rect)):
+			return True
+		return False
+
 
 	def update(self, timeInterval):
 		"""
@@ -273,6 +283,7 @@ def main():
 							car.model.bottomLeft.y > WINDOW_HEIGHT) or
 					(car.model.bottomRight.y > WINDOW_HEIGHT)):
 				car.reset(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
+
 
 		# Draw the white background onto the surface.
 		windowSurface.fill(WHITE)
