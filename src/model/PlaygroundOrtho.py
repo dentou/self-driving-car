@@ -53,7 +53,7 @@ ACCELERATION = 100 # pixels per second squared
 BRAKING_ACCELERATION = 300
 TURN_SPEED = 45 # degrees per second
 
-x0_car = 40
+x0_car = 70
 y0_car = 75
 
 CAR_WIDTH = 20
