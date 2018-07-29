@@ -31,10 +31,13 @@ def drawLineWithCircles(screen, color, start, end, thickness):
 		aprogress = 1 - progress
 		x = int(aprogress * start[0] + progress * end[0])
 		y = int(aprogress * start[1] + progress * end[1])
-		pygame.draw.circle(screen, color, (x, y), thickness)
+		#pygame.draw.circle(screen, color, (x, y), thickness)
+		rect = pygame.Rect(0, 0, thickness, thickness)
+		rect.center = (x, y)
+		pygame.draw.rect(screen, color, rect)
 
 
-def drawSegment(screen, color, start, end, width=100, center_thickness=3, border_thickness=10):
+def drawSegment(screen, color, start, end, width=100, centerThickness=3, borderThickness=10):
 	"""
 	Draw track segment
 	:param screen:
@@ -42,8 +45,8 @@ def drawSegment(screen, color, start, end, width=100, center_thickness=3, border
 	:param start:
 	:param end:
 	:param width:
-	:param center_thickness:
-	:param border_thickness:
+	:param centerThickness:
+	:param borderThickness:
 	:return:
 	"""
 	vector = (end[0] - start[0], end[1] - start[1])
@@ -51,20 +54,20 @@ def drawSegment(screen, color, start, end, width=100, center_thickness=3, border
 	perp_vector = (-1 * vector[1] / norm, vector[0] / norm)
 
 	# Draw center line
-	pygame.draw.lines(screen, color, False, [start, end], center_thickness)
+	pygame.draw.lines(screen, color, False, [start, end], centerThickness)
 	# draw_line_with_circles(screen, color, start, end, centerThickness)
 
 	# Draw "left" border line
-	left_start = (round(start[0] + perp_vector[0] * width / 2), round(start[1] + perp_vector[1] * width / 2))
-	left_end = (round(end[0] + perp_vector[0] * width / 2), round(end[1] + perp_vector[1] * width / 2))
-	# pygame.draw.lines(screen, color, False, [leftStart, leftEnd], borderThickness)
-	drawLineWithCircles(screen, color, left_start, left_end, border_thickness)
+	leftStart = (round(start[0] + perp_vector[0] * width / 2), round(start[1] + perp_vector[1] * width / 2))
+	leftEnd = (round(end[0] + perp_vector[0] * width / 2), round(end[1] + perp_vector[1] * width / 2))
+	pygame.draw.lines(screen, color, False, [leftStart, leftEnd], borderThickness)
+	#drawLineWithCircles(screen, color, left_start, left_end, border_thickness)
 
 	# Draw "right" border line
-	right_start = (round(start[0] - perp_vector[0] * width / 2), round(start[1] - perp_vector[1] * width / 2))
-	right_end = (round(end[0] - perp_vector[0] * width / 2), round(end[1] - perp_vector[1] * width / 2))
-	# pygame.draw.lines(screen, color, False, [rightStart, rightEnd], borderThickness)
-	drawLineWithCircles(screen, color, right_start, right_end, border_thickness)
+	rightStart = (round(start[0] - perp_vector[0] * width / 2), round(start[1] - perp_vector[1] * width / 2))
+	rightEnd = (round(end[0] - perp_vector[0] * width / 2), round(end[1] - perp_vector[1] * width / 2))
+	pygame.draw.lines(screen, color, False, [rightStart, rightEnd], borderThickness)
+	#drawLineWithCircles(screen, color, right_start, right_end, border_thickness)
 
 
 def drawTrack(screen, color, point_list):

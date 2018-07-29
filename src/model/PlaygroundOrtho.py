@@ -128,9 +128,9 @@ while True:
 			car.accelerate(-ACCELERATION)
 		if car.isMoving():
 			if moveLeft:
-				car.turn(TURN_SPEED / FPS)
-			elif moveRight:
 				car.turn(-TURN_SPEED / FPS)
+			elif moveRight:
+				car.turn(TURN_SPEED / FPS)
 			if (not moveUp) and (not moveDown) and car.isMoving():
 				#car.brake(BRAKING_ACCELERATION)
 				car.accelerate(0)

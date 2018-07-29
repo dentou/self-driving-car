@@ -8,6 +8,7 @@ from pygame.math import Vector2
 from pygame.locals import *
 from Point import Point
 from utils.Utils import *
+from Camera import Camera
 
 
 class Car:
@@ -24,8 +25,8 @@ class Car:
 	VELOCITY_THRESHOLD = 0.5 # if velocity < threshold then the car will not move
 	ACCELERATION_THRESHOLD = 5
 
-	def __init__(self, position=(0, 0), size=(50, 100), velocity=0, acceleration=0):
-		self.direction = Vector2(0, -1).normalize()
+	def __init__(self, position=(0, 0), direction=(0, -1), size=(50, 100), velocity=0, acceleration=0):
+		self.direction = Vector2(direction).normalize()
 		self.velocity = velocity
 		self.acceleration = acceleration
 		self.totalAcceleration = acceleration
@@ -129,38 +130,36 @@ class Model:
 		self.topRight = Point(left + width, top)
 		self.bottomLeft = Point(left, top + height)
 		self.bottomRight = Point(left + width, top + height)
+		self.pointList = [self.topLeft, self.topRight, self.bottomRight, self.bottomLeft]
 
 	def getPointList(self):
 		"""
 		:return: list of points as tuples
 		"""
-		return [self.topLeft.asTuple(), self.topRight.asTuple(), self.bottomRight.asTuple(),
-				self.bottomLeft.asTuple()]
+		return [point.asTuple() for point in self.pointList]
 
 	def move(self, dx, dy):
 		"""
 		Shift model
 		"""
-		self.topLeft.shift(dx, dy)
-		self.topRight.shift(dx, dy)
-		self.bottomLeft.shift(dx, dy)
-		self.bottomRight.shift(dx, dy)
+		for point in self.pointList:
+			point.shift(dx, dy)
 
 	def getCenter(self):
 		center_x = (self.topLeft.x + self.bottomRight.x) / 2
 		center_y = (self.topLeft.y + self.bottomRight.y) / 2
-		return center_x, center_y
+		return Point(center_x, center_y)
 
 	def rotate(self, angle):
-		newTopLeft = rotatePoint(self.topLeft, Point(*self.getCenter()), angle)
-		newTopRight = rotatePoint(self.topRight, Point(*self.getCenter()), angle)
-		newBottomLeft = rotatePoint(self.bottomLeft, Point(*self.getCenter()), angle)
-		newBottomRight = rotatePoint(self.bottomRight, Point(*self.getCenter()), angle)
+		center = self.getCenter().asTuple()
+		#
+		# self.topLeft = rotatePoint(self.topLeft, Point(*center), angle)
+		# self.topRight = rotatePoint(self.topRight, Point(*center), angle)
+		# self.bottomLeft = rotatePoint(self.bottomLeft, Point(*center), angle)
+		# self.bottomRight = rotatePoint(self.bottomRight, Point(*center), angle)
+		for point in self.pointList:
+			point.rotate(Point(*center), angle)
 
-		self.topLeft = newTopLeft
-		self.topRight = newTopRight
-		self.bottomLeft = newBottomLeft
-		self.bottomRight = newBottomRight
 
 
 def main():
@@ -180,6 +179,12 @@ def main():
 	windowSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), 0, 32)
 	pygame.display.set_caption('Car test')
 
+	# Setup world's parameter
+	WORLD_WIDTH = 1200
+	WORLD_HEIGHT = 1200
+	pointList = []
+	camera = Camera(300, 300, 100, 100, WORLD_WIDTH, WINDOW_HEIGHT)
+
 	# Set up the colors.
 	BLACK = (0, 0, 0)
 	GREEN = (0, 255, 0)
@@ -192,12 +197,18 @@ def main():
 	BRAKING_ACCELERATION = 300
 	TURN_SPEED = 45 # degrees per second
 
+	# Setup circle for camera scrolling detection
+	circleCenter = Point(50, 50)
+	pointList.append(circleCenter)
+
 	# Setup car
 	x0 = 300
 	y0 = 300
 	CAR_WIDTH = 20
 	CAR_HEIGHT = 40
 	car = Car(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
+	# Add car points to point list
+	pointList.extend(car.model.pointList)
 
 	# Choose whether to set car when going out of window
 	CAR_RESET = True
@@ -260,9 +271,9 @@ def main():
 				car.accelerate(-ACCELERATION)
 			if car.isMoving():
 				if moveLeft:
-					car.turn(TURN_SPEED / FPS)
-				elif moveRight:
 					car.turn(-TURN_SPEED / FPS)
+				elif moveRight:
+					car.turn(TURN_SPEED / FPS)
 				if (not moveUp) and (not moveDown) and car.isMoving():
 					#car.brake(BRAKING_ACCELERATION)
 					car.accelerate(0)
@@ -270,26 +281,30 @@ def main():
 
 		car.update(1 / FPS)
 
+		#camera.focus(car.model.getCenter(), pointList)
+
 		# If car goes out of window, reset
-		if CAR_RESET:
-			if ((car.model.topLeft.x < 0) or (car.model.topRight.x < 0) or (car.model.bottomLeft.x < 0) or (
-					car.model.bottomRight.x < 0) or
-					(car.model.topLeft.x > WINDOW_WIDTH) or (car.model.topRight.x > WINDOW_WIDTH) or (
-							car.model.bottomLeft.x > WINDOW_WIDTH) or
-					(car.model.bottomRight.x > WINDOW_WIDTH) or
-					(car.model.topLeft.y < 0) or (car.model.topRight.y < 0) or (car.model.bottomLeft.y < 0) or (
-							car.model.bottomRight.y < 0) or
-					(car.model.topLeft.y > WINDOW_HEIGHT) or (car.model.topRight.y > WINDOW_HEIGHT) or (
-							car.model.bottomLeft.y > WINDOW_HEIGHT) or
-					(car.model.bottomRight.y > WINDOW_HEIGHT)):
-				car.reset(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
+		# if CAR_RESET:
+		# 	if ((car.model.topLeft.x < 0) or (car.model.topRight.x < 0) or (car.model.bottomLeft.x < 0) or (
+		# 			car.model.bottomRight.x < 0) or
+		# 			(car.model.topLeft.x > WINDOW_WIDTH) or (car.model.topRight.x > WINDOW_WIDTH) or (
+		# 					car.model.bottomLeft.x > WINDOW_WIDTH) or
+		# 			(car.model.bottomRight.x > WINDOW_WIDTH) or
+		# 			(car.model.topLeft.y < 0) or (car.model.topRight.y < 0) or (car.model.bottomLeft.y < 0) or (
+		# 					car.model.bottomRight.y < 0) or
+		# 			(car.model.topLeft.y > WINDOW_HEIGHT) or (car.model.topRight.y > WINDOW_HEIGHT) or (
+		# 					car.model.bottomLeft.y > WINDOW_HEIGHT) or
+		# 			(car.model.bottomRight.y > WINDOW_HEIGHT)):
+		# 		car.reset(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 
 		# Draw the white background onto the surface.
 		windowSurface.fill(WHITE)
 
 		# Draw small circle to check if camera is moving with car (then the circle will move in reverse direction)
-		pygame.draw.circle(windowSurface, BLACK, (50, 50), 20)
+		circleCenter.x = int(circleCenter.x)
+		circleCenter.y = int(circleCenter.y)
+		pygame.draw.circle(windowSurface, BLACK, circleCenter.asTuple(), 20)
 
 		# Draw car
 		car.draw(windowSurface, BLACK)
@@ -303,7 +318,7 @@ def main():
 		TEXT_VGAP = 15
 		# Position
 		posText = basicFont.render(
-			"(x,y) = ({0:.0f},{1:.0f})".format(car.model.getCenter()[0], car.model.getCenter()[1]), True, BLACK)
+			"(x,y) = ({0:.0f},{1:.0f})".format(car.model.getCenter().x, car.model.getCenter().y), True, BLACK)
 		posRect = posText.get_rect()
 		posRect.topleft = (TEXT_X0, TEXT_Y0)
 		# Velocity
