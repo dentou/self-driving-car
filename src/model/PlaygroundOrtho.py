@@ -52,13 +52,14 @@ ACCELERATION = 100 # pixels per second squared
 					# final speed will be ACCELERATION / DRAG_COEFF
 BRAKING_ACCELERATION = 300
 TURN_SPEED = 45 # degrees per second
+CAR_DIRECTION = (1,0)
 
 x0_car = 70
 y0_car = 75
 
 CAR_WIDTH = 20
 CAR_HEIGHT = 40
-car = Car(position=(x0_car, y0_car), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
+car = Car(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT))
 
 # Set up movement variables.
 moveUp = False
@@ -68,8 +69,10 @@ moveRight = False
 brake = False
 
 # Set up sensor variable
-SENSORRANGE = 100
-RAYSIZE = 1
+SENSOR_RANGE = 100
+RAY_SIZE = 1
+SENSOR_ANGLE = 120
+SENSOR_COUNT = 5
 
 # Game loop
 while True:
@@ -143,7 +146,7 @@ while True:
 			(car.model.topLeft.y > WINDOW_HEIGHT) or (car.model.topRight.y > WINDOW_HEIGHT) or (
 					car.model.bottomLeft.y > WINDOW_HEIGHT) or
 			(car.model.bottomRight.y > WINDOW_HEIGHT)):
-		car.reset(position=(x0_car, y0_car), size=(CAR_WIDTH, CAR_HEIGHT))
+		car.reset(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT)) #reset car to original position 
 
 	# Draw the white background onto the surface.
 	windowSurface.fill(BLACK)
@@ -152,20 +155,20 @@ while True:
 	car.draw(windowSurface, WHITE)
 
 	# Create sensor for car
-	carSensor = SimpleFrontSensor(car.model.topLeft, car.model.topRight, rnge = SENSORRANGE, angle = 120, count = 5)
+	carSensor = SimpleFrontSensor(car.model.topLeft, car.model.topRight, rnge = SENSOR_RANGE, angle = SENSOR_ANGLE, count = SENSOR_COUNT)
 	carSensor.readSensor(track.walls)
 
 	# Draw sensor
 	for sensor in carSensor.sensorList:
-		if sensor['dist'] < SENSORRANGE:
-			pygame.draw.line(windowSurface, RED, sensor['pos'].asTuple(), carSensor.MiddleFront.asTuple(), RAYSIZE)
+		if sensor['dist'] < SENSOR_RANGE:
+			pygame.draw.line(windowSurface, RED, sensor['pos'].asTuple(), carSensor.MiddleFront.asTuple(), RAY_SIZE)
 		else:
-			pygame.draw.line(windowSurface, YELLOW, sensor['pos'].asTuple(), carSensor.MiddleFront.asTuple(), RAYSIZE)
+			pygame.draw.line(windowSurface, YELLOW, sensor['pos'].asTuple(), carSensor.MiddleFront.asTuple(), RAY_SIZE)
 
     # check if car has intersected with any wall
 	for i, wall in enumerate(track.walls):
 		if car.isCollideWithRect(wall):
-			car.reset(position=(x0_car, y0_car), size=(CAR_WIDTH, CAR_HEIGHT)) #reset car to original position
+			car.reset(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT)) #reset car to original position
 			currCheckpoints = track.checkpoints[:] #reset checkpoints
 			currCheckpointshitbox = track.checkpointshitbox[:]
 			car.draw(windowSurface, RED) #not working, why?

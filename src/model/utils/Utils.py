@@ -21,13 +21,13 @@ def angleBetween(vectorA, vectorB):
 	return vectorA.angle_to(vectorB)
 
 
-def shiftPoint(point, dx, dy):
+def shiftPoint(point, dx, dy): #does not modify original point
 	newX = point.x + dx
 	newY = point.y + dy
 	return Point(newX, newY)
 
 
-def shiftPointByVector(point, vector):
+def shiftPointByVector(point, vector): #does not modify original point
 	newX = point.x + vector.x
 	newY = point.y + vector.y
 	return Point(newX, newY)

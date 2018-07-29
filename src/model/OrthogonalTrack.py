@@ -342,7 +342,7 @@ def main():
     WINDOWWIDTH = 600
     WINDOWHEIGHT = 600
     windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
-    pygame.display.set_caption('Race Track')
+    pygame.display.set_caption('Orthogonal Track')
 
     # set up the colors
     BLACK = (0, 0, 0)
@@ -356,7 +356,6 @@ def main():
     Y0 = 50
 
     #set track
-
     #counterclockwise
     # cpslist = [ {'dir': DOWN,  'w': 80, 'l': 200},
     #             {'dir': DOWN,  'w': 40, 'l': 200},

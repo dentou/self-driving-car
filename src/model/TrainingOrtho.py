@@ -8,6 +8,7 @@ from pygame.locals import *
 from OrthogonalTrack import OrthogonalTrack, trackTemplate2
 from Car import Car
 from Sensor import SimpleFrontSensor
+from neuralnet.feedForwardNeuralNet import NeuralNetwork
 
 # set up pygame
 pygame.init()
@@ -44,17 +45,36 @@ y0_track = 50
 track = trackTemplate2(x0_track, y0_track)
 
 # Create current checkpoints list
-currCheckpoints = track.checkpoints[:]
-currCheckpointshitbox = track.checkpointshitbox[:]
+#currCheckpoints = track.checkpoints[:]
+#currCheckpointshitbox = track.checkpointshitbox[:]
 
-# Set up cars, sensors parameters
-x0_car = 60
-y0_car = 100
+# Set up cars parameters
+x0_car = 70
+y0_car = 75
 CAR_WIDTH = 20
 CAR_HEIGHT = 40
 
-SENSORRANGE = 100
-RAYSIZE = 1
+# Set up sensor parameters
+SENSOR_RANGE = 100
+RAY_SIZE = 1
+SENSOR_ANGLE = 120
+SENSOR_COUNT = 5
+
+# Set up neural network parameters
+NN_SIZE = [SENSOR_COUNT, 6, 4]
+
+# Initialize 20 instances of "individual", each instance is a dictionary with attribute
+# 'car'
+# 'sensor'
+# 'nn' (neural net)
+# 'cps' (checkpoints)
+# 'cpshb' (checkpointshitbox)
+population = [{'car': Car(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT)),
+			   'sensor': None,
+			   'nn': NeuralNetwork(sizes = NN_SIZE),
+			   'cps': track.checkpoints[:],
+			   'cpshb': track.checkpointshitbox[:]
+			} for _ in range(20)]
 
 # Set up movement variables.
 moveUp = False

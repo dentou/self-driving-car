@@ -38,12 +38,16 @@ class Car:
 	def draw(self, surface, color):
 		pygame.draw.polygon(surface, color, self.model.getPointList())
 
-	def reset(self, position=(0, 0), size=(50, 100), velocity=0, acceleration=0):
-		self.model = Model(position[0], position[1], size[0], size[1])
+	def reset(self, position=(0, 0), direction=DEFAULT_DIRECTION, size=(50, 100), velocity=0, acceleration=0):
+		self.direction = Vector2(self.DEFAULT_DIRECTION).normalize()
 		self.velocity = velocity
 		self.acceleration = acceleration
 		self.totalAcceleration = acceleration
-		self.direction = Vector2(0, -1).normalize()
+		self.model = Model(position[0], position[1], size[0], size[1])
+		self.isBraking = False
+		#self.direction = Vector2(0, -1).normalize()
+
+		self.turn(angleBetween(Vector2(self.DEFAULT_DIRECTION), Vector2(direction)))
 
 	def accelerate(self, value):
 		"""
