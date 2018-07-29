@@ -19,19 +19,21 @@ class Car:
 		acceleration: applied scalar acceleration w.r.t to direction
 		totalAcceleration: = acceleration + drag
 	"""
-
+	DEFAULT_DIRECTION = (0, -1)
 	DEFAULT_BRAKING_ACCELERATION = 100
 	DRAG_COEFF = 1.33 # unit: 1/sec; settling time = 4 / DRAG_COEFF =  3 sec
 	VELOCITY_THRESHOLD = 0.5 # if velocity < threshold then the car will not move
 	ACCELERATION_THRESHOLD = 5
 
-	def __init__(self, position=(0, 0), direction=(0, -1), size=(50, 100), velocity=0, acceleration=0):
-		self.direction = Vector2(direction).normalize()
+	def __init__(self, position=(0, 0), direction=DEFAULT_DIRECTION, size=(50, 100), velocity=0, acceleration=0):
+		self.direction = Vector2(self.DEFAULT_DIRECTION).normalize()
 		self.velocity = velocity
 		self.acceleration = acceleration
 		self.totalAcceleration = acceleration
 		self.model = Model(position[0], position[1], size[0], size[1])
 		self.isBraking = False
+
+		self.turn(angleBetween(Vector2(self.DEFAULT_DIRECTION), Vector2(direction)))
 
 	def draw(self, surface, color):
 		pygame.draw.polygon(surface, color, self.model.getPointList())
@@ -81,7 +83,7 @@ class Car:
 	def turn(self, angle):
 		"""
 		Turn the car by angle
-		:param angle: in degrees, positive means counter-clockwise rotation
+		:param angle: from -180 degrees to 180 degrees, positive means CLOCKWISE rotation
 		"""
 		# Rotate direction vector
 		self.direction = rotateVector(self.direction, angle)
@@ -206,7 +208,7 @@ def main():
 	y0 = 300
 	CAR_WIDTH = 20
 	CAR_HEIGHT = 40
-	car = Car(position=(x0, y0), size=(CAR_WIDTH, CAR_HEIGHT))
+	car = Car(position=(x0, y0), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
 	# Add car points to point list
 	pointList.extend(car.model.pointList)
 

@@ -61,10 +61,10 @@ ACCELERATION = 100 # pixels per second squared
 BRAKING_ACCELERATION = 300
 TURN_SPEED = 45 # degrees per second
 x0_car = 40
-y0_car = 100
+y0_car = 75
 CAR_WIDTH = 20
 CAR_HEIGHT = 40
-car = Car(position=(x0_car, y0_car), size=(CAR_WIDTH, CAR_HEIGHT))
+car = Car(position=(x0_car, y0_car), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 # Set up movement variables.
 moveUp = False
