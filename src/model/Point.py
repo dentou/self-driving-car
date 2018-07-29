@@ -11,6 +11,21 @@ class Point:
 		self.x = x_init
 		self.y = y_init
 
+	def __repr__(self):
+		return "".join(["Point(", str(self.x), ",", str(self.y), ")"])
+
+	def __eq__(self, other):
+		return (self.x, self.y) == (other.x, other.y)
+
+	def __ne__(self, other):
+		return not(self == other)
+
+	def __hash__(self):
+		return hash((self.x, self.y))
+
+	def asFuncTuple(self, func):
+		return (func(self.x), func(self.y))
+
 
 	def asTuple(self):
 		return (self.x, self.y)
@@ -58,13 +73,12 @@ class Point:
 	def distanceTo(self, PointB):
 		return sqrt((self.x - PointB.x) ** 2 + (self.y - PointB.y) ** 2)
 
-	def __repr__(self):
-		return "".join(["Point(", str(self.x), ",", str(self.y), ")"])
+	def distanceToLine(self, pointA, pointB):
+		num = abs((pointB.y - pointA.y) * self.x - (pointB.x - pointA.x) * self.y + pointB.x * pointA.y - pointB.y * pointA.x)
+		den = sqrt((pointB.x - pointA.x) ** 2 + (pointB.y - pointA.y) ** 2)
+		return num/den
 
-	def __eq__(self, other):
-		if self.x != other.x or self.y != other.y:
-			return False
-		return True
+
 
 
 def distanceBetween(PointA, PointB):

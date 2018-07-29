@@ -18,7 +18,12 @@ def angleBetween(vectorA, vectorB):
 	# dot = vectorA.x * vectorB.x + vectorA.y * vectorB.y  # dot product between [xA, yA] and [xB, yB]
 	# det = vectorA.x * vectorB.y - vectorA.y * vectorB.x  # determinant
 	# angle = atan2(det, dot)  # atan2(y, x) or atan2(sin, cos)
-	return vectorA.angle_to(vectorB)
+	angle = vectorA.angle_to(vectorB)
+	if angle < -180:
+		angle += 360
+	if angle > 180:
+		angle -= 360
+	return angle
 
 
 def shiftPoint(point, dx, dy): #does not modify original point
