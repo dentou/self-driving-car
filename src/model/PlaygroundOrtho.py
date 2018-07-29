@@ -52,13 +52,10 @@ ACCELERATION = 100 # pixels per second squared
 					# final speed will be ACCELERATION / DRAG_COEFF
 BRAKING_ACCELERATION = 300
 TURN_SPEED = 45 # degrees per second
-<<<<<<< HEAD
-x0_car = 60
-y0_car = 100
-=======
+
 x0_car = 40
 y0_car = 75
->>>>>>> 7da2c523af8f21cc09beb69c3eabbf640418c0d0
+
 CAR_WIDTH = 20
 CAR_HEIGHT = 40
 car = Car(position=(x0_car, y0_car), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
