@@ -62,18 +62,22 @@ while True:
 	# Get move direction
 	print('Acceleration value: '+str(acce.value))
 	if acce.value > MINACCE:
-		print('Acceleration larger than '+str(MINACCE)+'. Car is accelerating.')
+		#Debugging
+		#print('Acceleration larger than '+str(MINACCE)+'. Car is accelerating.')
 		moveUp = True
 	else:
-		print('Car is not accelerating')
+		#Debugging
+		#print('Car is not accelerating')
 		moveUp = False
 	print('Turnspeed value: '+str(tusp.value))
 	if tusp.value > 0:
-		print('Turning left')
+		#Debugging
+		#print('Turning left')
 		moveLeft = True
 		moveRight = False
 	else:
-		print('Turning right')
+		#Debugging
+		#print('Turning right')
 		moveLeft = False
 		moveRight = True
 

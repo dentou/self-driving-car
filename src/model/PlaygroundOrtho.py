@@ -5,7 +5,7 @@ Author: npgh2009 & dentou
 
 import pygame, sys, random
 from pygame.locals import *
-from OrthogonalTrack import OrthogonalTrack
+from OrthogonalTrack import OrthogonalTrack, trackTemplate2
 from Car import Car
 from Sensor import SimpleFrontSensor
 
@@ -38,20 +38,12 @@ DOWN = 2
 LEFT = 4
 RIGHT = 6
 
-# Setup track
-cpslist = [ {'dir': RIGHT,  'w': 80, 'l': 200},
-            {'dir': RIGHT,  'w': 60, 'l': 200},
-            {'dir': DOWN, 'w': 70, 'l': 160},
-            {'dir': DOWN, 'w': 55, 'l': 160},
-            {'dir': LEFT,    'w': 70, 'l': 140},
-            {'dir': LEFT,    'w': 50, 'l': 140},
-            {'dir': UP,  'w': 60, 'l': 120},
-            {'dir': UP,  'w': 45, 'l': 120}]
-
-x0_track = 80
+#Setup track
+x0_track = 50
 y0_track = 50
-track = OrthogonalTrack(cpslist, x0_track, y0_track)
-# Create new checkpoints list
+track = trackTemplate2(x0_track, y0_track)
+
+# Create current checkpoints list
 currCheckpoints = track.checkpoints[:]
 currCheckpointshitbox = track.checkpointshitbox[:]
 
@@ -60,11 +52,16 @@ ACCELERATION = 100 # pixels per second squared
 					# final speed will be ACCELERATION / DRAG_COEFF
 BRAKING_ACCELERATION = 300
 TURN_SPEED = 45 # degrees per second
-x0_car = 40
+<<<<<<< HEAD
+x0_car = 60
 y0_car = 100
+=======
+x0_car = 40
+y0_car = 75
+>>>>>>> 7da2c523af8f21cc09beb69c3eabbf640418c0d0
 CAR_WIDTH = 20
 CAR_HEIGHT = 40
-car = Car(position=(x0_car, y0_car), size=(CAR_WIDTH, CAR_HEIGHT))
+car = Car(position=(x0_car, y0_car), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 # Set up movement variables.
 moveUp = False
@@ -128,9 +125,9 @@ while True:
 			car.accelerate(-ACCELERATION)
 		if car.isMoving():
 			if moveLeft:
-				car.turn(TURN_SPEED / FPS)
-			elif moveRight:
 				car.turn(-TURN_SPEED / FPS)
+			elif moveRight:
+				car.turn(TURN_SPEED / FPS)
 			if (not moveUp) and (not moveDown) and car.isMoving():
 				#car.brake(BRAKING_ACCELERATION)
 				car.accelerate(0)
@@ -158,7 +155,7 @@ while True:
 	car.draw(windowSurface, WHITE)
 
 	# Create sensor for car
-	carSensor = SimpleFrontSensor(car.model.topLeft, car.model.topRight, rnge = SENSORRANGE)
+	carSensor = SimpleFrontSensor(car.model.topLeft, car.model.topRight, rnge = SENSORRANGE, angle = 120, count = 5)
 	carSensor.readSensor(track.walls)
 
 	# Draw sensor

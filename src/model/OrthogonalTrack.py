@@ -45,6 +45,20 @@ class OrthogonalTrack(object):
             self.checkpoints += cprect
             self.checkpointshitbox += cprecthitbox
 
+    def addWall(self, x, y, dir, length):
+        if dir == DOWN:
+            self.walls.append(pygame.Rect(x, y, WALLWIDTH, length))
+        elif dir == RIGHT:
+            self.walls.append(pygame.Rect(x, y, length, WALLWIDTH))
+
+    def addCheckPoint(self, x, y, dir, length):
+        if dir == DOWN:
+            self.checkpoints.append(pygame.Rect(x, y, CHECKPOINTWIDTH, length))
+            self.checkpointshitbox.append(pygame.Rect(x, y, CHECKPOINTHITBOX, length))
+        elif dir == RIGHT:
+            self.checkpoints.append(pygame.Rect(x, y, length, CHECKPOINTWIDTH))
+            self.checkpointshitbox.append(pygame.Rect(x, y, length, CHECKPOINTHITBOX))
+
 def createCheckPoint(cp):
     #cp is a dictionary with keys 'x', 'y', 'dir', 'w(idth)', 'l(ength)'
     cprect = []
@@ -283,13 +297,41 @@ def createLeftToRightShrink(yl, yr, wl, wr, xl):
 def createTopToBottomShrink(xt, xb, wt, wb, yt):
     wall1 = pygame.Rect(xt-WALLWIDTH, yt+1, xb-xt, WALLWIDTH)
     wall2 = pygame.Rect(xb+wb+WALLWIDTH, yt+1, wt-wb-(xb-xt), WALLWIDTH) #wt-wb-xb-xt
-    #wall2 = pygame.Rect(0,0,0,0)
     return wall1, wall2
  
 def createBottomToTopShrink(xt, xb, wt, wb, yt):
     wall1 = pygame.Rect(xb-WALLWIDTH, yt+1-WALLWIDTH, xt-xb, WALLWIDTH)
     wall2 = pygame.Rect(xt+wt+WALLWIDTH, yt+1-WALLWIDTH, wb-wt-(xt-xb), WALLWIDTH)
     return wall1, wall2
+
+
+
+def trackTemplate1(X0, Y0):
+    #clockwise
+    cpslist = [ {'dir': RIGHT,  'w': 80, 'l': 200},
+                {'dir': RIGHT,  'w': 40, 'l': 200},
+                {'dir': DOWN, 'w': 70, 'l': 160},
+                {'dir': DOWN, 'w': 35, 'l': 160},
+                {'dir': LEFT,    'w': 60, 'l': 140},
+                {'dir': LEFT,    'w': 30, 'l': 140},
+                {'dir': UP,  'w': 40, 'l': 120},
+                {'dir': UP,  'w': 20, 'l': 120}]
+    return OrthogonalTrack(cpslist, X0, Y0)
+
+def trackTemplate2(X0, Y0):
+    cpslist = [ {'dir': RIGHT,  'w': 100, 'l': 200},
+            {'dir': RIGHT,  'w': 60, 'l': 200},
+            {'dir': DOWN, 'w': 70, 'l': 160},
+            {'dir': DOWN, 'w': 55, 'l': 160},
+            {'dir': LEFT,    'w': 70, 'l': 140},
+            {'dir': LEFT,    'w': 50, 'l': 140},
+            {'dir': UP,  'w': 60, 'l': 120},
+            {'dir': UP,  'w': 45, 'l': 120}]
+
+    track = OrthogonalTrack(cpslist, X0, Y0)
+    track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, DOWN, WALLWIDTH*2 + cpslist[0]['w'])
+
+    return track
 
 def main():
     # set up pygame
@@ -325,18 +367,18 @@ def main():
     #             {'dir': LEFT,  'w': 40, 'l': 120},
     #             {'dir': LEFT,  'w': 20, 'l': 120}]
 
-    #clockwise
-    cpslist = [ {'dir': RIGHT,  'w': 80, 'l': 200},
-                {'dir': RIGHT,  'w': 40, 'l': 200},
-                {'dir': DOWN, 'w': 70, 'l': 160},
-                {'dir': DOWN, 'w': 35, 'l': 160},
-                {'dir': LEFT,    'w': 60, 'l': 140},
-                {'dir': LEFT,    'w': 30, 'l': 140},
-                {'dir': UP,  'w': 40, 'l': 120},
-                {'dir': UP,  'w': 20, 'l': 120}]
+    # #clockwise
+    # cpslist = [ {'dir': RIGHT,  'w': 80, 'l': 200},
+    #             {'dir': RIGHT,  'w': 40, 'l': 200},
+    #             {'dir': DOWN, 'w': 70, 'l': 160},
+    #             {'dir': DOWN, 'w': 35, 'l': 160},
+    #             {'dir': LEFT,    'w': 60, 'l': 140},
+    #             {'dir': LEFT,    'w': 30, 'l': 140},
+    #             {'dir': UP,  'w': 40, 'l': 120},
+    #             {'dir': UP,  'w': 20, 'l': 120}]
 
     #create track
-    track = OrthogonalTrack(cpslist, X0, Y0)
+    track = trackTemplate2(X0, Y0)
 
     while True:
         # check for the QUIT event

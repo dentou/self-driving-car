@@ -9,14 +9,14 @@ from utils.Utils import *
 from Point import *
 
 class SimpleSensor(object):
-	def __init__(self, rect, sensorrange = 100, sensorresolution = 1):
+	def __init__(self, rect, sensorRange = 100, sensorResolution = 1):
 		"""
 		Simple sensor that attaches to 4 side of the input rectangle
 		"""
 		self.rect = rect
-		self.RANGE = sensorrange
-		self.RESOLUTION = sensorresolution
-		self.sensors = {'left':sensorrange, 'right':sensorrange, 'top':sensorrange, 'bottom':sensorrange}
+		self.RANGE = sensorRange
+		self.RESOLUTION = sensorResolution
+		self.sensors = {'left':sensorRange, 'right':sensorRange, 'top':sensorRange, 'bottom':sensorRange}
 
 	def readSensor(self, objectlist):
 		"""
@@ -70,7 +70,7 @@ class SimpleSensor(object):
 			
 		#Bottom sensor
 		ssbot = self.rect.bottom #y-coordinate
-		while (ssbot - self.rect.bottom) < SENSORRANGE:
+		while (ssbot - self.rect.bottom) < self.RANGE:
 			for obj in objectlist:
 				if isPointInsideRect(self.rect.centerx, ssbot, obj):
 					self.sensors['bottom'] = ssbot - self.rect.bottom
@@ -80,7 +80,7 @@ class SimpleSensor(object):
 				flag = False
 				break
 			ssbot += self.RESOLUTION
-			
+
 		return self.sensors
 
 class SimpleFrontSensor(object):
@@ -105,14 +105,14 @@ class SimpleFrontSensor(object):
 		self.frontSideVector = Vector2(PointA.x - PointB.x, PointA.y - PointB.y)
 		angle_increment = self.angle / (self.count - 1)
 		angle_offset = (180 - self.angle) / 2
-		self.sensorList[0]['dir'] = rotateVector(self.frontSideVector, -angle_offset).normalize() #leftmost sensor
-		self.sensorList[-1]['dir'] = rotateVector(self.frontSideVector, -(angle_offset + angle)).normalize() #rightmost sensor
+		self.sensorList[0]['dir'] = rotateVector(self.frontSideVector, angle_offset).normalize() #leftmost sensor
+		self.sensorList[-1]['dir'] = rotateVector(self.frontSideVector, (angle_offset + angle)).normalize() #rightmost sensor
 		for i in range(1, count-1):
-			self.sensorList[i]['dir'] = rotateVector(self.frontSideVector, - (angle_offset + angle_increment * i)).normalize() #middle sensor
+			self.sensorList[i]['dir'] = rotateVector(self.frontSideVector, (angle_offset + angle_increment * i)).normalize() #middle sensor
 		for i in range(count):
-			self.sensorList[i]['pos'] = self.MiddleFront.shiftByVector(self.sensorList[i]['dir']*rnge)
+			self.sensorList[i]['pos'] = shiftPointByVector(self.MiddleFront, self.sensorList[i]['dir']*rnge)
 
-	def readSensor(self, objectlist):
+	def readSensor(self, objectList):
 		"""
 		Sensor start from self.MiddleFront
 		Increment by self.RESOLUTION until it detects a target object
@@ -121,10 +121,10 @@ class SimpleFrontSensor(object):
 		flag = False
 
 		for i in range(self.count):
-			self.sensorList[i]['pos'] = self.MiddleFront
+			self.sensorList[i]['pos'] = Point(self.MiddleFront.x, self.MiddleFront.y) # new point for each sensor
 			self.sensorList[i]['dist'] = 0
 			while self.sensorList[i]['dist'] < self.RANGE:
-				for obj in objectlist:
+				for obj in objectList:
 					if isPointInsideRect(self.sensorList[i]['pos'], obj):
 						self.sensorList[i]['dist'] = self.sensorList[i]['dist']
 						flag = True
@@ -134,4 +134,4 @@ class SimpleFrontSensor(object):
 					break
 
 				self.sensorList[i]['dist'] += self.RESOLUTION
-				self.sensorList[i]['pos'] = self.sensorList[i]['pos'].shiftByVector(self.sensorList[i]['dir'] * self.RESOLUTION)
+				self.sensorList[i]['pos'].shiftByVector(self.sensorList[i]['dir'] * self.RESOLUTION)
