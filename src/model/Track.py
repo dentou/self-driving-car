@@ -7,8 +7,114 @@ Some code adapted from https://nerdparadise.com/programming/pygame/part6
 
 import pygame
 import sys
-import math
+from math import *
 from math import sqrt, cos, sin
+from utils.Utils import *
+
+class Track:
+
+	DEFAULT_WIDTH = 100
+
+	def __init__(self, centerPoints, widthMap, screen, color, centerLineThickness, borderLineThickness):
+		"""
+
+		:param centerPoints: List Point objects
+		:param widths: Dictionary (map) of {point:width} items, where width is the width of track at this point to next one
+		:param screen:
+		:param color:
+		:param centerLineThickness:
+		:param borderLineThickness:
+		"""
+		self.centerPoints = centerPoints
+		self.widthMap = widthMap
+		self.screen = screen
+		self.color = color
+		self.centerLineThickness = centerLineThickness
+		self.borderLineThickness = borderLineThickness
+
+
+	def generateBorderPoints(self):
+		self.leftBorderPoints = []
+		self.rightBorderPoints = []
+		self.__generateStartBorderPoints()
+		self.__generateMiddleBorderPoints()
+		self.__generateEndBorderPoints()
+
+
+	def __generateMiddleBorderPoints(self):
+		for i in range(1, len(self.centerPoints) - 1):
+			previous = self.centerPoints[i-1]
+			point = self.centerPoints[i]
+			next = self.centerPoints[i+1]
+
+			vp = Vector2(previous.x - point.x, previous.y - point.y).normalize()
+			vn = Vector2(next.x - point.x, next.y - point.y).normalize()
+
+			angle = angleBetween(vp, vn)
+			print("Angle: ", angle)
+
+			previousHalfWidth = self.widthMap[previous] / (2 * sin(radians(abs(angle)/2)))
+			halfWidth = self.widthMap[point] / (2 * sin(radians(abs(angle)/2)))
+
+			print(previousHalfWidth)
+			print(halfWidth)
+
+
+			# delta1 = delta2 = abs((halfWidth - previousHalfWidth) * tan(radians(angle / 2)) / 2)
+			delta1 = delta2 = 0
+
+			vright = rotateVector(vp, angle / 2)
+			vleft = rotateVector(vright, 180)
+
+
+			self.leftBorderPoints.append(shiftPointByVector(point, vleft * previousHalfWidth + vp * delta1))
+			self.leftBorderPoints.append(shiftPointByVector(point, vleft * halfWidth + vn * delta2))
+
+			self.rightBorderPoints.append(shiftPointByVector(point, vright * previousHalfWidth + vp * delta1))
+			self.rightBorderPoints.append(shiftPointByVector(point, vright * halfWidth + vn * delta2))
+
+
+	def __generateStartBorderPoints(self):
+		startPoint = self.centerPoints[0]
+		nextPoint = self.centerPoints[1]
+
+		width = self.widthMap[startPoint]
+
+		dirVector = Vector2(nextPoint.x - startPoint.x, nextPoint.y - startPoint.y)
+		normalVector = rotateVector(dirVector, -90).normalize()
+
+		self.leftBorderPoints.append(shiftPointByVector(startPoint, normalVector * width / 2))
+		self.rightBorderPoints.append(shiftPointByVector(startPoint, rotateVector(normalVector, 180) * width / 2))
+
+
+	def __generateEndBorderPoints(self):
+		endPoint = self.centerPoints[-1]
+		previousPoint = self.centerPoints[-2]
+
+		width = self.widthMap[previousPoint]
+
+		dirVector = Vector2(endPoint.x - previousPoint.x, endPoint.y - previousPoint.y)
+		normalVector = rotateVector(dirVector, -90).normalize()
+
+		self.leftBorderPoints.append(shiftPointByVector(endPoint, normalVector * width / 2))
+		self.rightBorderPoints.append(shiftPointByVector(endPoint, rotateVector(normalVector, 180) * width / 2))
+
+
+	def draw(self):
+		pygame.draw.lines(self.screen, self.color, False,[point.asFuncTuple(ceil) for point in self.centerPoints], self.centerLineThickness)
+		pygame.draw.lines(self.screen, self.color, True, [point.asFuncTuple(ceil) for point in (self.leftBorderPoints + list(reversed(self.rightBorderPoints)))], self.borderLineThickness)
+
+
+	def collidedWith(self, pointList):
+		for point in pointList:
+			if self.isCollided(point):
+				return True
+		return False
+
+	def collidedWith(self, point):
+		for i in range(len(self.centerPoints) - 1):
+			dist = point.distanceToLine(self.centerPoints[i], self.centerPoints[i+1])
+
 
 
 def drawLineWithCircles(screen, color, start, end, thickness):
@@ -37,51 +143,6 @@ def drawLineWithCircles(screen, color, start, end, thickness):
 		pygame.draw.rect(screen, color, rect)
 
 
-def drawSegment(screen, color, start, end, width=100, centerThickness=3, borderThickness=10):
-	"""
-	Draw track segment
-	:param screen:
-	:param color:
-	:param start:
-	:param end:
-	:param width:
-	:param centerThickness:
-	:param borderThickness:
-	:return:
-	"""
-	vector = (end[0] - start[0], end[1] - start[1])
-	norm = sqrt(vector[0] ** 2 + vector[1] ** 2)
-	perp_vector = (-1 * vector[1] / norm, vector[0] / norm)
-
-	# Draw center line
-	pygame.draw.lines(screen, color, False, [start, end], centerThickness)
-	# draw_line_with_circles(screen, color, start, end, centerThickness)
-
-	# Draw "left" border line
-	leftStart = (round(start[0] + perp_vector[0] * width / 2), round(start[1] + perp_vector[1] * width / 2))
-	leftEnd = (round(end[0] + perp_vector[0] * width / 2), round(end[1] + perp_vector[1] * width / 2))
-	pygame.draw.lines(screen, color, False, [leftStart, leftEnd], borderThickness)
-	#drawLineWithCircles(screen, color, left_start, left_end, border_thickness)
-
-	# Draw "right" border line
-	rightStart = (round(start[0] - perp_vector[0] * width / 2), round(start[1] - perp_vector[1] * width / 2))
-	rightEnd = (round(end[0] - perp_vector[0] * width / 2), round(end[1] - perp_vector[1] * width / 2))
-	pygame.draw.lines(screen, color, False, [rightStart, rightEnd], borderThickness)
-	#drawLineWithCircles(screen, color, right_start, right_end, border_thickness)
-
-
-def drawTrack(screen, color, point_list):
-	"""
-	Draw track
-	:param screen:
-	:param color:
-	:param point_list:
-	:return:
-	"""
-	for index, point in enumerate(point_list[:-1]):
-		drawSegment(screen, color, point, point_list[index + 1])
-
-
 if __name__ == "__main__":
 	# Set up the colors.
 	BLACK = (0, 0, 0)
@@ -95,13 +156,25 @@ if __name__ == "__main__":
 	screen.fill(WHITE)
 	clock = pygame.time.Clock()
 
-	pointList = []
-	for angle in range(360):
-		x = 300 + 100*cos(angle * math.pi / 180)
-		y = 300 + 100*sin(angle * math.pi / 180)
-		pointList.append((x, y))
+	pointList = [Point(100, 100), Point(400, 100), Point(400, 500), Point(200, 600)]
+	widthMap = dict()
+	widthMap[pointList[0]] = 100
+	widthMap[pointList[1]] = 75
+	widthMap[pointList[2]] = 120
+	# pointList = []
+	# for angle in range(361):
+	# 	x = 300 + 100*cos(radians(angle))
+	# 	y = 300 + 100*sin(radians(angle))
+	# 	pointList.append(Point(x, y))
 
-	drawTrack(screen, BLACK, pointList)
+
+	track = Track(pointList, widthMap, screen, BLACK, 3, 7)
+	track.generateBorderPoints()
+	print(track.centerPoints)
+	print(track.leftBorderPoints)
+	print(track.rightBorderPoints)
+	track.draw()
+	# drawTrack(screen, BLACK, pointList)
 
 	pygame.display.update()
 
