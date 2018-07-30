@@ -1,14 +1,13 @@
 """
 Track model
 Author: dentou
-Some code adapted from https://nerdparadise.com/programming/pygame/part6
 """
 
 
 import pygame
 import sys
 from math import *
-from math import sqrt, cos, sin
+from math import sqrt, cos, sin, radians
 from utils.Utils import *
 
 class Track:
@@ -96,12 +95,20 @@ class Track:
 
 
 	def collidedWithPolygon(self, pointList):
+		""""
+		Return track checkpoint where one of the points in pointList collided with
+		"""
 		for point in pointList:
-			if self.collidedWithPoint(point):
-				return True
-		return False
+			checkpoint = self.collidedWithPoint(point)
+			if checkpoint > 0:
+				return checkpoint
+		return -1
 
 	def collidedWithPoint(self, point):
+		""""
+		Return track checkpoint where point collided with
+		Example: 2.6 means point collided with track between checkpoint 2 and 3 and at 60% distance from checkpoint 2 to 3
+		"""
 		minDist = point.distanceToLine(self.centerPoints[0], self.centerPoints[1])
 		index = 0
 		for i in range(1, len(self.centerPoints) - 1):
@@ -109,34 +116,13 @@ class Track:
 			if dist < minDist:
 				index = i
 				minDist = dist
-		return 2 * minDist >= self.widthMap[self.centerPoints[index]]
-
-
-
-def drawLineWithCircles(screen, color, start, end, thickness):
-	"""
-	Draw line by combining adjacent circles
-	Adapted from https://nerdparadise.com/programming/pygame/part6
-	:param screen:
-	:param color:
-	:param start:
-	:param end:
-	:param thickness:
-	:return:
-	"""
-	dx = start[0] - end[0]
-	dy = start[1] - end[1]
-	iterations = max(abs(dx), abs(dy))
-
-	for i in range(iterations):
-		progress = 1.0 * i / iterations
-		aprogress = 1 - progress
-		x = int(aprogress * start[0] + progress * end[0])
-		y = int(aprogress * start[1] + progress * end[1])
-		#pygame.draw.circle(screen, color, (x, y), thickness)
-		rect = pygame.Rect(0, 0, thickness, thickness)
-		rect.center = (x, y)
-		pygame.draw.rect(screen, color, rect)
+		if 2 * minDist >= self.widthMap[self.centerPoints[index]]: # collided
+			tangentVector = self.centerPoints[index].vectorTo(self.centerPoints[index + 1])
+			posVector = self.centerPoints[index].vectorTo(point)
+			segmentTravelled = tangentVector.dot(posVector)/(tangentVector.length() * cos(radians(angleBetween(tangentVector, posVector))))
+			checkpoint =  index + segmentTravelled / tangentVector.length()
+			return checkpoint
+		return -1
 
 
 if __name__ == "__main__":

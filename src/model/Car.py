@@ -96,7 +96,10 @@ class Car:
 			return True
 		return False
 
-	def isCollidedWithTrack(self, track):
+	def collidedWithTrack(self, track):
+		""""
+		Return track checkpoint where car collided
+		"""
 		return track.collidedWithPolygon(self.model.pointList)
 
 

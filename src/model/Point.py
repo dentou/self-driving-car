@@ -32,6 +32,9 @@ class Point:
 	def asTuple(self):
 		return (self.x, self.y)
 
+	def vectorTo(self, point):
+		return Vector2(point.x - self.x, point.y - self.y)
+
 	def shift(self, dx, dy):
 		self.x += dx
 		self.y += dy

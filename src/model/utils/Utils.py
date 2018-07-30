@@ -56,6 +56,9 @@ def rotatePoint(point, pivot, angle):
 	return Point(px, py)
 
 
+
+
+
 def rotateVector(vector, angle):
 	"""
 	:param vector: Vector2 to be rotated (won't be changed)

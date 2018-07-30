@@ -121,8 +121,9 @@ while True:
 
 	car.update(1 / FPS)
 
-	if car.isCollidedWithTrack(track):
-		print("Collided")
+	checkpoint = car.collidedWithTrack(track)
+	if checkpoint > 0:
+		print("Collided at checkpoint: ", checkpoint)
 		car.reset(position=(x0, y0), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 	# Draw the white background onto the surface.
