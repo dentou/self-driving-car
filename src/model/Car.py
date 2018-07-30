@@ -9,6 +9,7 @@ from pygame.locals import *
 from Point import Point
 from utils.Utils import *
 from Camera import Camera
+from Track import Track
 
 
 class Car:
@@ -26,14 +27,7 @@ class Car:
 	ACCELERATION_THRESHOLD = 5
 
 	def __init__(self, position=(0, 0), direction=DEFAULT_DIRECTION, size=(50, 100), velocity=0, acceleration=0):
-		self.direction = Vector2(self.DEFAULT_DIRECTION).normalize()
-		self.velocity = velocity
-		self.acceleration = acceleration
-		self.totalAcceleration = acceleration
-		self.model = Model(position[0], position[1], size[0], size[1])
-		self.isBraking = False
-
-		self.turn(angleBetween(Vector2(self.DEFAULT_DIRECTION), Vector2(direction)))
+		self.reset(position, direction, size, velocity, acceleration)
 
 	def draw(self, surface, color):
 		pygame.draw.polygon(surface, color, self.model.getPointList())
@@ -45,7 +39,6 @@ class Car:
 		self.totalAcceleration = acceleration
 		self.model = Model(position[0], position[1], size[0], size[1])
 		self.isBraking = False
-		#self.direction = Vector2(0, -1).normalize()
 
 		self.turn(angleBetween(Vector2(self.DEFAULT_DIRECTION), Vector2(direction)))
 
@@ -103,6 +96,9 @@ class Car:
 			return True
 		return False
 
+	def isCollidedWithTrack(self, track):
+		return track.collidedWithPolygon(self.model.pointList)
+
 
 	def update(self, timeInterval):
 		"""
@@ -158,11 +154,6 @@ class Model:
 
 	def rotate(self, angle):
 		center = self.getCenter().asTuple()
-		#
-		# self.topLeft = rotatePoint(self.topLeft, Point(*center), angle)
-		# self.topRight = rotatePoint(self.topRight, Point(*center), angle)
-		# self.bottomLeft = rotatePoint(self.bottomLeft, Point(*center), angle)
-		# self.bottomRight = rotatePoint(self.bottomRight, Point(*center), angle)
 		for point in self.pointList:
 			point.rotate(Point(*center), angle)
 

@@ -5,6 +5,8 @@ Adapted from https://gist.github.com/hirokai/9202782
 
 from math import sqrt, sin, cos, pi
 from pygame.math import Vector2
+import numpy as np
+
 
 class Point:
 	def __init__(self, x_init, y_init):
@@ -45,18 +47,6 @@ class Point:
 		:param pivot: pivot point
 		:param angle: positive means CLOCKWISE rotation
 		"""
-		# positive angle means counter-clockwise rotation
-		# vx = self.x - pivot.x
-		# vy = self.y - pivot.y
-		#
-		# s = sin(angle * pi / 180)
-		# c = cos(angle * pi / 180)
-		#
-		# new_vy = vy * c - vx * s
-		# new_vx = vy * s + vx * c
-		#
-		# self.x = new_vx + pivot.x
-		# self.y = new_vy + pivot.y
 
 		vx = self.x - pivot.x
 		vy = self.y - pivot.y
@@ -74,11 +64,14 @@ class Point:
 		return sqrt((self.x - PointB.x) ** 2 + (self.y - PointB.y) ** 2)
 
 	def distanceToLine(self, pointA, pointB):
-		num = abs((pointB.y - pointA.y) * self.x - (pointB.x - pointA.x) * self.y + pointB.x * pointA.y - pointB.y * pointA.x)
-		den = sqrt((pointB.x - pointA.x) ** 2 + (pointB.y - pointA.y) ** 2)
-		return num/den
-
-
+		# num = abs((pointB.y - pointA.y) * self.x - (pointB.x - pointA.x) * self.y + pointB.x * pointA.y - pointB.y * pointA.x)
+		# den = sqrt((pointB.x - pointA.x) ** 2 + (pointB.y - pointA.y) ** 2)
+		# return num/den
+		p = np.asarray(self.asTuple())
+		pA = np.asarray(pointA.asTuple())
+		pB = np.asarray(pointB.asTuple())
+		d = np.linalg.norm(np.cross(pB - pA, pA - p)) / np.linalg.norm(pB - pA)
+		return d
 
 
 def distanceBetween(PointA, PointB):

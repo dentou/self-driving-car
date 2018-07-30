@@ -19,7 +19,7 @@ class Track:
 		"""
 
 		:param centerPoints: List Point objects
-		:param widths: Dictionary (map) of {point:width} items, where width is the width of track at this point to next one
+		:param widthMap: Dictionary (map) of {point:width} items, where width is the width of track at this point to next one
 		:param screen:
 		:param color:
 		:param centerLineThickness:
@@ -44,34 +44,24 @@ class Track:
 	def __generateMiddleBorderPoints(self):
 		for i in range(1, len(self.centerPoints) - 1):
 			previous = self.centerPoints[i-1]
-			point = self.centerPoints[i]
+			now = self.centerPoints[i]
 			next = self.centerPoints[i+1]
 
-			vp = Vector2(previous.x - point.x, previous.y - point.y).normalize()
-			vn = Vector2(next.x - point.x, next.y - point.y).normalize()
+			vp = Vector2(previous.x - now.x, previous.y - now.y).normalize()
+			vn = Vector2(next.x - now.x, next.y - now.y).normalize()
 
 			angle = angleBetween(vp, vn)
-			print("Angle: ", angle)
+			# print("Angle: ", angle)
 
-			previousHalfWidth = self.widthMap[previous] / (2 * sin(radians(abs(angle)/2)))
-			halfWidth = self.widthMap[point] / (2 * sin(radians(abs(angle)/2)))
+			w1 = self.widthMap[previous] / 2
+			w2 = self.widthMap[now] / 2
 
-			print(previousHalfWidth)
-			print(halfWidth)
+			x = (w1 + w2 * cos(radians(angle))) / sin(radians(angle))
+			# print("x = ", x)
+			normalVector = rotateVector(vn, -90)
 
-
-			# delta1 = delta2 = abs((halfWidth - previousHalfWidth) * tan(radians(angle / 2)) / 2)
-			delta1 = delta2 = 0
-
-			vright = rotateVector(vp, angle / 2)
-			vleft = rotateVector(vright, 180)
-
-
-			self.leftBorderPoints.append(shiftPointByVector(point, vleft * previousHalfWidth + vp * delta1))
-			self.leftBorderPoints.append(shiftPointByVector(point, vleft * halfWidth + vn * delta2))
-
-			self.rightBorderPoints.append(shiftPointByVector(point, vright * previousHalfWidth + vp * delta1))
-			self.rightBorderPoints.append(shiftPointByVector(point, vright * halfWidth + vn * delta2))
+			self.leftBorderPoints.append(shiftPointByVector(now, normalVector * w2 + vn * x))
+			self.rightBorderPoints.append(shiftPointByVector(now, -normalVector * w2 - vn * x))
 
 
 	def __generateStartBorderPoints(self):
@@ -102,18 +92,24 @@ class Track:
 
 	def draw(self):
 		pygame.draw.lines(self.screen, self.color, False,[point.asFuncTuple(ceil) for point in self.centerPoints], self.centerLineThickness)
-		pygame.draw.lines(self.screen, self.color, True, [point.asFuncTuple(ceil) for point in (self.leftBorderPoints + list(reversed(self.rightBorderPoints)))], self.borderLineThickness)
+		pygame.draw.lines(self.screen, self.color, False, [point.asFuncTuple(ceil) for point in (self.leftBorderPoints + list(reversed(self.rightBorderPoints)))], self.borderLineThickness)
 
 
-	def collidedWith(self, pointList):
+	def collidedWithPolygon(self, pointList):
 		for point in pointList:
-			if self.isCollided(point):
+			if self.collidedWithPoint(point):
 				return True
 		return False
 
-	def collidedWith(self, point):
-		for i in range(len(self.centerPoints) - 1):
+	def collidedWithPoint(self, point):
+		minDist = point.distanceToLine(self.centerPoints[0], self.centerPoints[1])
+		index = 0
+		for i in range(1, len(self.centerPoints) - 1):
 			dist = point.distanceToLine(self.centerPoints[i], self.centerPoints[i+1])
+			if dist < minDist:
+				index = i
+				minDist = dist
+		return 2 * minDist >= self.widthMap[self.centerPoints[index]]
 
 
 
@@ -156,7 +152,7 @@ if __name__ == "__main__":
 	screen.fill(WHITE)
 	clock = pygame.time.Clock()
 
-	pointList = [Point(100, 100), Point(400, 100), Point(400, 500), Point(200, 600)]
+	pointList = [Point(100, 100), Point(400, 100), Point(200, 400), Point(500, 500)]
 	widthMap = dict()
 	widthMap[pointList[0]] = 100
 	widthMap[pointList[1]] = 75
@@ -168,7 +164,7 @@ if __name__ == "__main__":
 	# 	pointList.append(Point(x, y))
 
 
-	track = Track(pointList, widthMap, screen, BLACK, 3, 7)
+	track = Track(pointList, widthMap, screen, BLACK, 2, 7)
 	track.generateBorderPoints()
 	print(track.centerPoints)
 	print(track.leftBorderPoints)
