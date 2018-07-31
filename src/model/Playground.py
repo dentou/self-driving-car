@@ -33,7 +33,7 @@ BLUE  = (0, 0, 255)
 pointList = [Point(100, 100), Point(400, 100), Point(200, 400), Point(500, 500)]
 widthMap = dict()
 widthMap[pointList[0]] = 100
-widthMap[pointList[1]] = 60
+widthMap[pointList[1]] = 75
 widthMap[pointList[2]] = 120
 track = Track(pointList, widthMap, screen, BLACK, 2, 7)
 track.generateBorderPoints()
@@ -42,7 +42,7 @@ print(track.leftBorderPoints)
 print(track.rightBorderPoints)
 
 # Setup car
-x0 = 200
+x0 = 75
 y0 = 75
 CAR_WIDTH = 20
 CAR_HEIGHT = 40
@@ -123,7 +123,7 @@ while True:
 
 	checkpoint = car.collidedWithTrack(track)
 	if checkpoint > 0:
-		print("Collided at: {0:.2f}% of total distance".format(checkpoint * 100))
+		print("Collided at checkpoint: ", checkpoint)
 		car.reset(position=(x0, y0), direction=(1,0), size=(CAR_WIDTH, CAR_HEIGHT))
 
 	# Draw the white background onto the surface.

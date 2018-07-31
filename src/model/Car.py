@@ -151,8 +151,8 @@ class Model:
 			point.shift(dx, dy)
 
 	def getCenter(self):
-		center_x = (self.topLeft.point.x + self.bottomRight.point.x) / 2
-		center_y = (self.topLeft.point.y + self.bottomRight.point.y) / 2
+		center_x = (self.topLeft.x + self.bottomRight.x) / 2
+		center_y = (self.topLeft.y + self.bottomRight.y) / 2
 		return Point(center_x, center_y)
 
 	def rotate(self, angle):

@@ -4,7 +4,6 @@ Author: dentou
 """
 
 from Point import Point
-from shapely import geometry, affinity
 import pygame
 from pygame.math import Vector2
 from math import sin, cos, pi, atan2
@@ -28,12 +27,15 @@ def angleBetween(vectorA, vectorB):
 
 
 def shiftPoint(point, dx, dy): #does not modify original point
-	newPoint = affinity.translate(point.point, dx, dy)
-	return Point(newPoint.x, newPoint.y)
+	newX = point.x + dx
+	newY = point.y + dy
+	return Point(newX, newY)
 
 
 def shiftPointByVector(point, vector): #does not modify original point
-	return shiftPoint(point, vector.x, vector.y)
+	newX = point.x + vector.x
+	newY = point.y + vector.y
+	return Point(newX, newY)
 
 
 def rotatePoint(point, pivot, angle):
@@ -44,8 +46,17 @@ def rotatePoint(point, pivot, angle):
 	:param angle: in degrees, positive means counter-clockwise rotation
 	:return: rotated point
 	"""
-	newPoint = affinity.rotate(point.point, angle, pivot.point, False)
-	return Point(newPoint.x, newPoint.y)
+
+	vector = Vector2(point.x - pivot.x, point.y - pivot.y)
+	rotated_vector = rotateVector(vector, angle)
+
+	px = rotated_vector.x + pivot.x
+	py = rotated_vector.y + pivot.y
+
+	return Point(px, py)
+
+
+
 
 
 def rotateVector(vector, angle):
@@ -88,12 +99,7 @@ def isPointInsideRect(PointA, rect):
 	"""
 	Detect if point is inside Rect
 	"""
-	if (PointA.point.x > rect.left) and (PointA.point.x < rect.right) and (PointA.point.y > rect.top) and (PointA.point.y < rect.bottom):
+	if (PointA.x > rect.left) and (PointA.x < rect.right) and (PointA.y > rect.top) and (PointA.y < rect.bottom):
 		return True
 	else:
 		return False
-
-def isPointInsidePolygon(point, vertices):
-	p = geometry.Point(point.asTuple())
-	polygon = geometry.Polygon([vertex.asTuple() for vertex in vertices])
-	return polygon.contains(p)

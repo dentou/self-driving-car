@@ -5,7 +5,6 @@ Author: dentou
 
 
 import pygame
-from shapely import geometry, affinity
 import sys
 from math import *
 from math import sqrt, cos, sin, radians
@@ -47,8 +46,8 @@ class Track:
 			now = self.centerPoints[i]
 			next = self.centerPoints[i+1]
 
-			vp = now.vectorTo(previous).normalize()
-			vn = now.vectorTo(next).normalize()
+			vp = Vector2(previous.x - now.x, previous.y - now.y).normalize()
+			vn = Vector2(next.x - now.x, next.y - now.y).normalize()
 
 			angle = angleBetween(vp, vn)
 			# print("Angle: ", angle)
@@ -70,7 +69,7 @@ class Track:
 
 		width = self.widthMap[startPoint]
 
-		dirVector = startPoint.vectorTo(nextPoint)
+		dirVector = Vector2(nextPoint.x - startPoint.x, nextPoint.y - startPoint.y)
 		normalVector = rotateVector(dirVector, -90).normalize()
 
 		self.leftBorderPoints.append(shiftPointByVector(startPoint, normalVector * width / 2))
@@ -83,7 +82,7 @@ class Track:
 
 		width = self.widthMap[previousPoint]
 
-		dirVector = previousPoint.vectorTo(endPoint)
+		dirVector = Vector2(endPoint.x - previousPoint.x, endPoint.y - previousPoint.y)
 		normalVector = rotateVector(dirVector, -90).normalize()
 
 		self.leftBorderPoints.append(shiftPointByVector(endPoint, normalVector * width / 2))
@@ -92,7 +91,7 @@ class Track:
 
 	def draw(self):
 		pygame.draw.lines(self.screen, self.color, False,[point.asFuncTuple(ceil) for point in self.centerPoints], self.centerLineThickness)
-		pygame.draw.lines(self.screen, self.color, True, [point.asFuncTuple(ceil) for point in (self.leftBorderPoints + list(reversed(self.rightBorderPoints)))], self.borderLineThickness)
+		pygame.draw.lines(self.screen, self.color, False, [point.asFuncTuple(ceil) for point in (self.leftBorderPoints + list(reversed(self.rightBorderPoints)))], self.borderLineThickness)
 
 
 	def collidedWithPolygon(self, pointList):
@@ -100,23 +99,30 @@ class Track:
 		Return track checkpoint where one of the points in pointList collided with
 		"""
 		for point in pointList:
-			percent =  self.collidedWithPoint(point)
-			if percent > 0:
-				return percent
+			checkpoint = self.collidedWithPoint(point)
+			if checkpoint > 0:
+				return checkpoint
 		return -1
 
 	def collidedWithPoint(self, point):
 		""""
-		Return the position at which point collides
-		Example: 0.66 means the point collides at 60% total distance of the track
+		Return track checkpoint where point collided with
+		Example: 2.6 means point collided with track between checkpoint 2 and 3 and at 60% distance from checkpoint 2 to 3
 		"""
-		for i in range(0, len(self.centerPoints) - 1):
-			polygon = [self.leftBorderPoints[i], self.leftBorderPoints[i+1], self.rightBorderPoints[i+1], self.rightBorderPoints[i]]
-			if isPointInsidePolygon(point, polygon):
-				return -1
-		centerLine = geometry.LineString([centerPoint.point for centerPoint in self.centerPoints])
-		return centerLine.project(point.point, normalized=True)
-
+		minDist = point.distanceToLine(self.centerPoints[0], self.centerPoints[1])
+		index = 0
+		for i in range(1, len(self.centerPoints) - 1):
+			dist = point.distanceToLine(self.centerPoints[i], self.centerPoints[i+1])
+			if dist < minDist:
+				index = i
+				minDist = dist
+		if 2 * minDist >= self.widthMap[self.centerPoints[index]]: # collided
+			tangentVector = self.centerPoints[index].vectorTo(self.centerPoints[index + 1])
+			posVector = self.centerPoints[index].vectorTo(point)
+			segmentTravelled = tangentVector.dot(posVector)/(tangentVector.length() * cos(radians(angleBetween(tangentVector, posVector))))
+			checkpoint =  index + segmentTravelled / tangentVector.length()
+			return checkpoint
+		return -1
 
 
 if __name__ == "__main__":
