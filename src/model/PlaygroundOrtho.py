@@ -180,6 +180,7 @@ while True:
 		if car.isCollideWithRect(cp):
 			currCheckpoints.pop(i)
 			currCheckpointshitbox.pop(i)
+			break
 
     # Draw walls and checkpoints
 	for i in range(len(track.walls)):

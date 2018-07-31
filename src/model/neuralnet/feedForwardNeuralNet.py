@@ -63,6 +63,7 @@ class NeuralNetwork(object):
         """
         Output of neural network if input is a
         """
+        a = a.reshape(self.sizes[0], 1) #reshape into matrix for consistency
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
         return a
@@ -94,20 +95,30 @@ def main():
     print("Weights")
     print(nn.weights)
 
-    a = nn.feedForward(np.array([100, 100, 100]))
-    print("Output from all 100 vectors")
+    a = nn.feedForward(np.array([100, 100, 100]).reshape(3,1))
+    print("Output from all-100 vectors")
     print(a)
+    print(a.shape)
 
-    b = nn.flattenWeights()
-    print("Flattened weights (genes)")
-    print(b)
+    #b = np.dot(nn.weights[0], np.array([100, 100, 100]).reshape(3,1))
+    #print("Output of first layer")
+    #print(b)
+    #print(np.dot(nn.weights[0], np.array([100, 100, 100]).reshape(3,1)).shape)
 
-    rdgenes = np.random.randn(4+3+3*4+4*3).tolist()
-    nn.editGenes(rdgenes)
-    print("Rerandom genes")
-    a = nn.feedForward(np.array([100, 100, 100]))
-    print("New output from all 100 vectors")
-    print(a)
+    #print("Biases of first layer")
+    #print(nn.biases[0])
+    #print(nn.biases[0].shape)
+
+    #b = nn.flattenWeights()
+    #print("Flattened weights (genes)")
+    #print(b)
+
+    #rdgenes = np.random.randn(4+3+3*4+4*3).tolist()
+    #nn.editGenes(rdgenes)
+    #print("Rerandom genes")
+    #a = nn.feedForward(np.array([100, 100, 100]))
+    #print("New output from all-100 vectors")
+    #print(a)
 
 
 if __name__ == "__main__":

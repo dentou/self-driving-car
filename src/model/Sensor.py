@@ -148,4 +148,4 @@ class SimpleFrontSensor(object):
 		for i in range(self.count):
 			vals.append(self.sensorList[i]['dist'])
 
-		return np.array(vals)
+		return np.array(vals).reshape(self.count, 1)

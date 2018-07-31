@@ -62,26 +62,34 @@ SENSOR_COUNT = 5
 
 # Set up neural network parameters
 NN_OUTPUT = 3 (Up, Left, Right)
-NN_SIZE = [SENSOR_COUNT, 6, 3]
+NN_SIZE = [SENSOR_COUNT, 6, NN_OUTPUT]
+THRESHOLD = 0.5 # Threshold for deciding whether to push button or not, choose by just passing SENSOR_RANGE into initial nn
 
-# Initialize 20 instances of "individual", each instance is a dictionary with attribute
+# Initialize 10 instances of car, each instance is a dictionary with attribute
 # 'car'
 # 'sensor'
 # 'nn' (Neural Network)
 # 'cps' (Checkpoints)
 # 'cpshb' (CheckpointsHitbox)
 # 'move': A dictionary with 4 keys 'Up', 'Down', 'Left', 'Right'
+# 'dead': Whether car is dead or not
+
+CAR_COUNT = 10
 cars = [{'car': Car(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT)),
 			'sensor': None,
 			'nn': NeuralNetwork(sizes = NN_SIZE),
 			'cps': track.checkpoints[:],
 			'cpshb': track.checkpointshitbox[:],
-			'move': {'Up': False,
-					'Down': False,
-					'Left': False,
-					'Right': False
-					}
-			} for _ in range(20)]
+			'move': {'up': False,
+					'down': False,
+					'left': False,
+					'right': False
+					},
+			'dead': False
+			} for _ in range(CAR_COUNT)]
+
+deadCount = 0
+generation = 1
 
 # Program loop
 while True:
@@ -93,15 +101,78 @@ while True:
 			sys.exit()
 
 	# Read sensor value from each car, then feed through neuralnet, then output movement variables
-	for i in range(len(cars)):
+	for i in range(CAR_COUNT):
 
-		# Initialize sensor, then read values (is there a way to prevent initialize each time)
-		cars[i]['sensor'] = SimpleFrontSensor(car.model.topLeft, car.model.topRight,
-									rnge = SENSOR_RANGE, angle = SENSOR_ANGLE, count = SENSOR_COUNT)
-		cars[i]['sensor'].readSensor(track.walls)
+		if cars[i]['dead']: #if car died, continue to next car
+			continue
 
-		# Feed sensor value into neuralnet
-		tempSensorValues = cars[i]['sensor'].outputValues()
-		nnOutputValues = cars[i]['nn'].feedForward(tempSensorValues)
+		else:
+			# Initialize sensor, then read values (is there a way to prevent initialize each time)
+			cars[i]['sensor'] = SimpleFrontSensor(car.model.topLeft, car.model.topRight,
+										rnge = SENSOR_RANGE, angle = SENSOR_ANGLE, count = SENSOR_COUNT)
+			cars[i]['sensor'].readSensor(track.walls)
+
+			# Feed sensor value into neuralnet
+			tempSensorValues = cars[i]['sensor'].outputValues() # 5x1 array
+			nnOutputValues = cars[i]['nn'].feedForward(tempSensorValues) # 3x1 array -> Up, Left, Right
+			nnOutputValues = nnOutputValues.flatten().tolist() # convert to list for easy manipulation
+
+			# Turn on movement variables when value exceeds threshold
+			upValue = nnOutputValues[0]
+			if upValue > THRESHOLD:
+				cars[i]['move']['up'] = True
+				cars[i]['move']['down'] = False
+			else:
+				cars[i]['move']['up'] = False
+
+			leftValue = nnOutputValues[1]
+			if leftValue > THRESHOLD:
+				cars[i]['move']['left'] = True
+				cars[i]['move']['right'] = False
+			else:
+				cars[i]['move']['left'] = False
+
+			rightValue = nnOutputValues[2]
+			if rightValue > THRESHOLD:
+				cars[i]['move']['right'] = True
+				cars[i]['move']['left'] = False
+			else:
+				cars[i]['move']['right'] = False
+
+			# Move the car
+			if cars[i]['move']['up']:
+				cars[i]['car'].accelerate(ACCELERATION)
+			if cars[i]['move']['down']:
+				cars[i]['car'].accelerate(-ACCELERATION)
+			if cars[i]['car'].isMoving():
+				if cars[i]['move']['left']:
+					cars[i]['car'].turn(-TURN_SPEED / FPS)
+				elif cars[i]['move']['right']:
+					cars[i]['car'].turn(TURN_SPEED / FPS)
+				if (not cars[i]['move']['left']) and (not cars[i]['move']['right']) and cars[i]['car'].isMoving():
+					#car.brake(BRAKING_ACCELERATION)
+					cars[i]['car'].accelerate(0)
+			
+			cars[i]['car'].update(1/FPS)
+
+			# Check if car has intersected with any wall
+			for wall in track.walls:
+				if cars[i]['car'].isCollideWithRect(wall):
+					cars[i]['dead'] = True
+					deadCount += 1
+					break
+
+			# Check if car has interested with any checkpoint (may rewrite)
+			for j, cp in enumerate(cars[i]['cps']):
+				if car.isCollideWithRect(cp):
+					currCheckpoints.pop(j)
+					currCheckpointshitbox.pop(j)
+
+	# Check if all cars are dead
+	if deadCount == CAR_COUNT:
+		
+
+
+
 
 		
