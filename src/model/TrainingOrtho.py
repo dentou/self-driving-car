@@ -164,15 +164,35 @@ while True:
 
 			# Check if car has interested with any checkpoint (may rewrite)
 			for j, cp in enumerate(cars[i]['cps']):
-				if car.isCollideWithRect(cp):
-					currCheckpoints.pop(j)
-					currCheckpointshitbox.pop(j)
+				if cars[i]['car'].isCollideWithRect(cp):
+					cars[i]['cps'].pop(j)
+					cars[i]['cpshb'].pop(j)
+
+	# Draw objects onto screen
+	windowSurface.fill(BLACK)
+
+	## Draw car
+
+	## Draw walls
+
+	## Draw texts
 
 	# Check if all cars are dead
 	if deadCount == CAR_COUNT:
 		
+		# Goes to next generation
+		generation += 1
 
 
+		# Update genes from geneCrossover and geneMutation
 
+		# Reset car parameters
+
+
+		pygame.time.wait(1000)
+
+	# Draw the window onto the screen.
+	pygame.display.update()
+	mainClock.tick(FPS)
 
 		
