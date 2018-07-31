@@ -40,6 +40,7 @@
 ### Python libraries
 
 * [pybox2d](https://github.com/pybox2d/pybox2d): 2D Game Physics
+* [shapely](https://pypi.org/project/Shapely/): Manipulation and analysis of geometric objects in the Cartesian plane.
 
 ### Machine learning
 
