@@ -7,6 +7,7 @@ from pygame.locals import *
 from pygame.math import Vector2
 from utils.Utils import *
 from Point import *
+import numpy as np
 
 class SimpleSensor(object):
 	def __init__(self, rect, sensorRange = 100, sensorResolution = 1):
@@ -97,11 +98,15 @@ class SimpleFrontSensor(object):
 		self.RESOLUTION = resolution
 		self.angle = angle
 		self.count = count
-		ss = {'dir': Vector2(1,1), 'dist': rnge}
-		self.sensorList = []
-		for _ in range(count):
-			self.sensorList.append(dict(ss))
+		
+		#self.sensorList is list of sensors, each sensor is a dict with keys
+		# 'dir': pygame Vector2
+		# 'dist': int, the value that sensor reads
+		# 'pos': the point at which sensor detects a obstacle
 
+		self.sensorList = [{'dir': Vector2(1,1), 'dist': rnge} for _ in range(count)]
+
+		# Configure sensors to correct directions
 		self.frontSideVector = Vector2(PointA.x - PointB.x, PointA.y - PointB.y)
 		angle_increment = self.angle / (self.count - 1)
 		angle_offset = (180 - self.angle) / 2
@@ -126,7 +131,6 @@ class SimpleFrontSensor(object):
 			while self.sensorList[i]['dist'] < self.RANGE:
 				for obj in objectList:
 					if isPointInsideRect(self.sensorList[i]['pos'], obj):
-						self.sensorList[i]['dist'] = self.sensorList[i]['dist']
 						flag = True
 						break
 				if flag:
@@ -135,3 +139,13 @@ class SimpleFrontSensor(object):
 
 				self.sensorList[i]['dist'] += self.RESOLUTION
 				self.sensorList[i]['pos'].shiftByVector(self.sensorList[i]['dir'] * self.RESOLUTION)
+
+	def outputValues(self):
+		"""
+		Append all the 'dist' values of sensors into a numpy array
+		"""
+		vals = []
+		for i in range(self.count):
+			vals.append(self.sensorList[i]['dist'])
+
+		return np.array(vals)

@@ -61,24 +61,47 @@ SENSOR_ANGLE = 120
 SENSOR_COUNT = 5
 
 # Set up neural network parameters
-NN_SIZE = [SENSOR_COUNT, 6, 4]
+NN_OUTPUT = 3 (Up, Left, Right)
+NN_SIZE = [SENSOR_COUNT, 6, 3]
 
 # Initialize 20 instances of "individual", each instance is a dictionary with attribute
 # 'car'
 # 'sensor'
-# 'nn' (neural net)
-# 'cps' (checkpoints)
-# 'cpshb' (checkpointshitbox)
-population = [{'car': Car(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT)),
-			   'sensor': None,
-			   'nn': NeuralNetwork(sizes = NN_SIZE),
-			   'cps': track.checkpoints[:],
-			   'cpshb': track.checkpointshitbox[:]
+# 'nn' (Neural Network)
+# 'cps' (Checkpoints)
+# 'cpshb' (CheckpointsHitbox)
+# 'move': A dictionary with 4 keys 'Up', 'Down', 'Left', 'Right'
+cars = [{'car': Car(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT)),
+			'sensor': None,
+			'nn': NeuralNetwork(sizes = NN_SIZE),
+			'cps': track.checkpoints[:],
+			'cpshb': track.checkpointshitbox[:],
+			'move': {'Up': False,
+					'Down': False,
+					'Left': False,
+					'Right': False
+					}
 			} for _ in range(20)]
 
-# Set up movement variables.
-moveUp = False
-moveDown = False
-moveLeft = False
-moveRight = False
-brake = False
+# Program loop
+while True:
+	# Get input event from user
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			#exit window
+			pygame.quit()
+			sys.exit()
+
+	# Read sensor value from each car, then feed through neuralnet, then output movement variables
+	for i in range(len(cars)):
+
+		# Initialize sensor, then read values (is there a way to prevent initialize each time)
+		cars[i]['sensor'] = SimpleFrontSensor(car.model.topLeft, car.model.topRight,
+									rnge = SENSOR_RANGE, angle = SENSOR_ANGLE, count = SENSOR_COUNT)
+		cars[i]['sensor'].readSensor(track.walls)
+
+		# Feed sensor value into neuralnet
+		tempSensorValues = cars[i]['sensor'].outputValues()
+		nnOutputValues = cars[i]['nn'].feedForward(tempSensorValues)
+
+		
