@@ -34,6 +34,7 @@ class NeuralNetwork(object):
             self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
 
         else:
+            #this part seems duplicate, could use editGenes fn below
             assert len(genes) == self.num_genes
             for i in sizes[1:]:
                 self.biases.append(np.array(genes[:i]).reshape(i, 1))
@@ -71,10 +72,10 @@ class NeuralNetwork(object):
     def flattenWeights(self):
         genes = []
         for b in self.biases:
-            genes += b.flatten().tolist()
+            genes.extend(b.flatten().tolist())
 
         for w in self.weights:
-            genes += w.flatten().tolist()
+            genes.extend(w.flatten().tolist())
 
         return genes
     
@@ -113,12 +114,12 @@ def main():
     #print("Flattened weights (genes)")
     #print(b)
 
-    #rdgenes = np.random.randn(4+3+3*4+4*3).tolist()
-    #nn.editGenes(rdgenes)
-    #print("Rerandom genes")
-    #a = nn.feedForward(np.array([100, 100, 100]))
-    #print("New output from all-100 vectors")
-    #print(a)
+    rdgenes = np.random.randn(4+3+3*4+4*3).tolist()
+    nn.editGenes(rdgenes)
+    print("Rerandom genes")
+    a = nn.feedForward(np.array([100, 100, 100]))
+    print("New output from all-100 vectors")
+    print(a)
 
 
 if __name__ == "__main__":
