@@ -17,19 +17,20 @@ import math
 
 class Crossover(object):
     
-    def __init__(self, weightsA, weightsB, sizes):
+    def __init__(self, genesA, genesB, sizes):
         """
         Take input parents as python list
+        sizes : list of nodes in layers of neural network
         """
-        self.weightsA = weightsA
-        self.weightsB = weightsB
+        self.genesA = genesA
+        self.genesB = genesB
         
-        assert len(weightsA) == len(weightsB)
-        self.wSize = len(weightsA)
+        assert len(genesA) == len(genesB)
+        self.gSize = len(genesA)
         
         self.sizes = sizes
         
-    def onePointCrossover(self, crossPoint):
+    def onePoint(self, crossPoint):
         """
         Not recommended since the bias is put at the front
         Example: crossPoint = 3
@@ -38,19 +39,19 @@ class Crossover(object):
         Result : 1 2 3 6 5 4 3 2 1
         
         """
-        return self.weightsA[:crossPoint]+self.weightsB[crossPoint:]
+        return self.genesA[:crossPoint]+self.genesB[crossPoint:]
     
-    def middlePointCrossover(self):
+    def middlePoint(self):
         """
         Example: 
         ParentA: 1 2 3 4 5 6 7 8 9
         ParentB: 9 8 7 6 5 4 3 2 1
         Result : 1 2 3 4 5 4 3 2 1
         """
-        n = int(self.wSize/2)
-        return self.onePointCrossover(n)
+        n = int(self.gSize/2)
+        return self.onePoint(n)
     
-    def multiPointCrossover(self, crossPoints):
+    def multiPoint(self, crossPoints):
         """
         Input crossPoints as alternating size of genes to take from each
         parents.
@@ -69,23 +70,23 @@ class Crossover(object):
             else:
                 b = b + [0]*i
         
-        assert len(b) == np.wSize
+        assert len(b) == self.gSize
         
-        w = [x*i+y*(1-i) for x, y, i in
-                     zip(self.weightsA, self.weightsB, b)]
+        w = [x*i+y*(1-i) for x, y, i in zip(self.genesA, self.genesB, b)]
+
         return w
     
-    def zigzagCrossover(self):
+    def zigzag(self):
         """
         Example: 
         ParentA: 1 2 3 4 5 6 7 8 9
         ParentB: 9 8 7 6 5 4 3 2 1
         Result : 1 8 3 6 5 4 7 2 9
         """
-        c = [1]*self.wSize
-        return self.multiPointCrossover(c)
+        c = [1]*self.gSize
+        return self.multiPoint(c)
     
-    def binomialCrossover(self, bias):
+    def binomial(self, bias = 0.5):
         """
         Generate a crossPoints list by flipping coin with bias
         then use multiPointCrossover to mix genes
@@ -105,16 +106,16 @@ class Crossover(object):
                 cP.append(1)
             currentFlip = nextFlip
         
-        return self.multiPointCrossover(cP)
+        return self.multiPoint(cP)
     
-    def linearArithmeticCombination(self, alpha):
+    def linearCombination(self, alpha):
         """
         Combine the two parents' genes by linear combination
         0 <= alpha <= 1
         weightChild = alpha*weightA + (1-alpha)*weightB
         """
         return [alpha*x + (1-alpha)*y for x, y in
-                            zip(self.weightsA, self.weightsB)]
+                            zip(self.genesA, self.genesB)]
 
 def flipCoin(bias):
     rdnum = random.random()

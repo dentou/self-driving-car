@@ -15,16 +15,19 @@ import random
 
 class Mutation(object):
     
-    def __init__(self, weights, sizes):
-        self.weights = weights
-        self.wSize = len(weights)
+    def __init__(self, genes, sizes):
+        self.genes = genes
+        self.gSize = len(genes)
         self.sizes = sizes
         
-    def normalDistMutation(self, genes, mu, sigma):
+    def gaussian(self, mu = 0, sigma = 0.1, mask = None):
         """
         Random mutation according to normal distribution on selected genes
-        genes is boolean list of length self.wSize indicating which gene to be
+        mask is 0/1 list of length self.wSize indicating which gene to be
         mutated
         """
-        return [w+i*random.gauss(mu, sigma) for w, i in
-                                zip(self.weights, genes)]
+        if mask == None:
+            return [w + random.gauss(mu, sigma) for w in self.genes]
+        else:
+            assert len(mask) == self.gSize
+            return [w + i*random.gauss(mu, sigma) for w, i in zip(self.weights, genes)]
