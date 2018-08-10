@@ -5,7 +5,7 @@ Author: npgh2009 & dentou
 
 import pygame, sys, random
 from pygame.locals import *
-from OrthogonalTrack import OrthogonalTrack, trackTemplate2
+from OrthogonalTrack import OrthogonalTrack, trackTemplate4, trackTemplate5
 from Car import Car
 from Sensor import SimpleFrontSensor
 
@@ -41,7 +41,7 @@ RIGHT = 6
 #Setup track
 x0_track = 50
 y0_track = 50
-track = trackTemplate2(x0_track, y0_track)
+track = trackTemplate5(x0_track, y0_track)
 
 # Create current checkpoints list
 currCheckpoints = track.checkpoints[:]
@@ -52,13 +52,13 @@ ACCELERATION = 100 # pixels per second squared
 					# final speed will be ACCELERATION / DRAG_COEFF
 BRAKING_ACCELERATION = 300
 TURN_SPEED = 45 # degrees per second
-CAR_DIRECTION = (1,0)
+CAR_DIRECTION = (0,1)
 
-x0_car = 70
-y0_car = 75
+x0_car = 80
+y0_car = 70
 
-CAR_WIDTH = 20
-CAR_HEIGHT = 40
+CAR_WIDTH = 15
+CAR_HEIGHT = 20
 car = Car(position=(x0_car, y0_car), direction=CAR_DIRECTION, size=(CAR_WIDTH, CAR_HEIGHT))
 
 # Set up movement variables.

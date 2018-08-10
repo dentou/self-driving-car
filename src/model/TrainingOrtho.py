@@ -5,7 +5,7 @@ Author: npgh2009 & dentou
 
 import pygame, sys, random
 from pygame.locals import *
-from OrthogonalTrack import OrthogonalTrack, trackTemplate2
+from OrthogonalTrack import trackTemplate2
 from Car import Car
 from Sensor import SimpleFrontSensor
 from neuralnet.feedForwardNeuralNet import NeuralNetwork
@@ -205,7 +205,7 @@ while True:
 	genRect = genText.get_rect()
 	genRect.topleft = (WINDOW_WIDTH - 275, 10)
 
-	clockText = basicFont.render("Clock: " + str(genClock), True, WHITE)
+	clockText = basicFont.render("Clock: " + str(genClock) + "/" + str(clockLimit), True, WHITE)
 	clockRect = clockText.get_rect()
 	clockRect.topleft = (WINDOW_WIDTH - 275, 25)
 	### Blit

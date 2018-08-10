@@ -35,6 +35,7 @@ class OrthogonalTrack(object):
         Output is self.walls and self.checkpoints, each containing pygame.Rect object
         """
         self.walls = processCpsList(X0, Y0, checkpointlist)
+        self.checkpointlist = checkpointlist
         self.checkpoints = []
         self.checkpointshitbox = []
         for cp in checkpointlist:
@@ -52,12 +53,29 @@ class OrthogonalTrack(object):
             self.walls.append(pygame.Rect(x, y, length, WALLWIDTH))
 
     def addCheckPoint(self, x, y, dir, length):
+        # not functioning
         if dir == DOWN:
             self.checkpoints.append(pygame.Rect(x, y, CHECKPOINTWIDTH, length))
             self.checkpointshitbox.append(pygame.Rect(x, y, CHECKPOINTHITBOX, length))
         elif dir == RIGHT:
             self.checkpoints.append(pygame.Rect(x, y, length, CHECKPOINTWIDTH))
             self.checkpointshitbox.append(pygame.Rect(x, y, length, CHECKPOINTHITBOX))
+
+    def addCheckPointInRect(self, x, y, xwidth, ywidth, dir):
+        if dir == DOWN:
+            pos = y
+            while pos < (y + ywidth):
+                self.checkpoints.append(pygame.Rect(x, pos, xwidth, CHECKPOINTWIDTH))
+                self.checkpointshitbox.append(pygame.Rect(x, pos, xwidth, CHECKPOINTHITBOX))
+                pos += CHECKPOINTSTEP
+
+        elif dir == RIGHT:
+            pos = x
+            while pos < (x + xwidth):
+                self.checkpoints.append(pygame.Rect(pos, y, CHECKPOINTWIDTH, ywidth))
+                self.checkpointshitbox.append(pygame.Rect(pos, y, CHECKPOINTHITBOX, ywidth))
+                pos += CHECKPOINTSTEP
+
 
 def createCheckPoint(cp):
     #cp is a dictionary with keys 'x', 'y', 'dir', 'w(idth)', 'l(ength)'
@@ -304,7 +322,7 @@ def createBottomToTopShrink(xt, xb, wt, wb, yt):
     wall2 = pygame.Rect(xt+wt+WALLWIDTH, yt+1-WALLWIDTH, wb-wt-(xt-xb), WALLWIDTH)
     return wall1, wall2
 
-
+## Creating template for easy use
 
 def trackTemplate1(X0, Y0):
     #clockwise
@@ -316,7 +334,11 @@ def trackTemplate1(X0, Y0):
                 {'dir': LEFT,    'w': 30, 'l': 140},
                 {'dir': UP,  'w': 40, 'l': 120},
                 {'dir': UP,  'w': 20, 'l': 120}]
-    return OrthogonalTrack(cpslist, X0, Y0)
+
+    track = OrthogonalTrack(cpslist, X0, Y0)
+    track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, DOWN, WALLWIDTH*2 + cpslist[0]['w']) #use this if first dir is RIGHT
+
+    return track
 
 def trackTemplate2(X0, Y0):
     cpslist = [ {'dir': RIGHT,  'w': 100, 'l': 200},
@@ -332,6 +354,102 @@ def trackTemplate2(X0, Y0):
     track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, DOWN, WALLWIDTH*2 + cpslist[0]['w'])
 
     return track
+
+def trackTemplate3(X0, Y0):
+    cpslist = [ {'dir': DOWN,  'w': 80, 'l': 200},
+            {'dir': DOWN,  'w': 40, 'l': 200},
+            {'dir': RIGHT, 'w': 70, 'l': 160},
+            {'dir': RIGHT, 'w': 35, 'l': 160},
+            {'dir': UP,    'w': 60, 'l': 140},
+            {'dir': UP,    'w': 30, 'l': 140},
+            {'dir': LEFT,  'w': 40, 'l': 120},
+            {'dir': LEFT,  'w': 20, 'l': 120}]
+
+    track = OrthogonalTrack(cpslist, X0, Y0)
+    track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, RIGHT, WALLWIDTH*2 + cpslist[0]['w']) #use this if first dir is DOWN
+
+    return track
+
+def trackTemplate4(X0, Y0):
+    cpslist = [ {'dir': DOWN,  'w': 80, 'l': 150},
+            {'dir': RIGHT, 'w': 70, 'l': 80},
+            {'dir': RIGHT, 'w': 50, 'l': 80},
+            {'dir': UP,    'w': 50, 'l': 50},
+            {'dir': LEFT,  'w': 50, 'l': 70},
+            {'dir': UP,  'w': 45, 'l': 35},
+            {'dir': RIGHT,  'w': 60, 'l': 120},
+            {'dir': RIGHT,  'w': 50, 'l': 70},
+            {'dir': DOWN,  'w': 60, 'l': 60},
+            {'dir': DOWN,  'w': 40, 'l': 100},
+            {'dir': DOWN,  'w': 70, 'l': 60},
+            {'dir': LEFT,  'w': 60, 'l': 100},
+            {'dir': LEFT,  'w': 50, 'l': 100},
+            {'dir': LEFT,  'w': 40, 'l': 100},
+            {'dir': DOWN,  'w': 55, 'l': 170},
+            {'dir': RIGHT,  'w': 55, 'l': 30},
+            {'dir': UP,  'w': 55, 'l': 90},
+            {'dir': RIGHT,  'w': 55, 'l': 30},
+            {'dir': DOWN,  'w': 55, 'l': 90},
+            {'dir': RIGHT,  'w': 55, 'l': 100},
+            {'dir': RIGHT,  'w': 40, 'l': 150},
+            {'dir': UP,  'w': 50, 'l': 30},
+            {'dir': LEFT,  'w': 40, 'l': 180},
+            {'dir': UP,  'w': 50, 'l': 30},
+            {'dir': RIGHT,  'w': 40, 'l': 150}
+            ]
+
+    track = OrthogonalTrack(cpslist, X0, Y0)
+    track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, RIGHT, WALLWIDTH*2 + cpslist[0]['w']) #use this if first dir is DOWN
+
+    return track
+
+def trackTemplate5(X0, Y0):
+    cpslist = [ {'dir': DOWN,  'w': 80, 'l': 150}, #0
+            {'dir': DOWN, 'w': 70, 'l': 100}, #1
+            {'dir': RIGHT, 'w': 70, 'l': 100}, #2
+            {'dir': RIGHT, 'w': 60, 'l': 100}, #3
+            {'dir': UP,    'w': 60, 'l': 90}, #4
+            {'dir': LEFT,  'w': 70, 'l': 100}, #5
+            {'dir': UP,  'w': 60, 'l': 65}, #6
+            {'dir': RIGHT,  'w': 70, 'l': 120}, #7
+            {'dir': RIGHT,  'w': 60, 'l': 70}, #8
+            {'dir': DOWN,  'w': 70, 'l': 80}, #9
+            {'dir': DOWN,  'w': 50, 'l': 100}, #10
+            {'dir': DOWN,  'w': 70, 'l': 80} #11
+            ]
+
+    track = OrthogonalTrack(cpslist, X0, Y0)
+    #print(cpslist)
+    track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, RIGHT, WALLWIDTH*2 + cpslist[0]['w']) #use this if first dir is DOWN
+    track.addCheckPointInRect(cpslist[1]['x'], cpslist[1]['y'] + cpslist[1]['l'], cpslist[1]['w'], cpslist[2]['w']*2/3, DOWN)
+    track.addCheckPointInRect(cpslist[3]['x'] + cpslist[3]['l'], cpslist[3]['y'], cpslist[4]['w']*2/3, cpslist[3]['w'], RIGHT)
+    track.addCheckPointInRect(cpslist[4]['x'], cpslist[5]['y'] + cpslist[5]['w']*1/3, cpslist[4]['w'], cpslist[5]['w']*2/3, DOWN)
+    track.addCheckPointInRect(cpslist[6]['x'] + cpslist[6]['w']*1/3 + WALLWIDTH*2, cpslist[5]['y'], cpslist[6]['w']*2/3, cpslist[5]['w'], RIGHT)
+    track.addCheckPointInRect(cpslist[6]['x'], cpslist[7]['y'] + cpslist[7]['w']*1/3, cpslist[6]['w'], cpslist[7]['w']*2/3, DOWN)
+    track.addCheckPointInRect(cpslist[8]['x'] + cpslist[8]['l'], cpslist[8]['y'], cpslist[9]['w']*2/3, cpslist[8]['w'], RIGHT)
+
+    return track
+
+def trackTemplate6(X0, Y0):
+    cpslist = [ {'dir': DOWN,  'w': 70, 'l': 120}, #0
+            {'dir': DOWN, 'w': 60, 'l': 100}, #1
+            {'dir': RIGHT, 'w': 70, 'l': 100}, #2
+            {'dir': RIGHT, 'w': 50, 'l': 100}, #3
+            {'dir': DOWN,  'w': 70, 'l': 60}, #4
+            {'dir': DOWN,  'w': 50, 'l': 100}, #5
+            {'dir': DOWN,  'w': 70, 'l': 60} #6
+            ]
+
+    track = OrthogonalTrack(cpslist, X0, Y0)
+    print(cpslist)
+    track.addWall(X0 - WALLWIDTH, Y0 - WALLWIDTH, RIGHT, WALLWIDTH*2 + cpslist[0]['w']) #use this if first dir is DOWN
+    track.addCheckPointInRect(cpslist[1]['x'], cpslist[1]['y'] + cpslist[1]['l'], cpslist[1]['w'], cpslist[2]['w']*1/3, DOWN)
+    track.addCheckPointInRect(cpslist[1]['x'] + cpslist[1]['w']*2/3, cpslist[1]['y'] + cpslist[1]['l'], cpslist[2]['w']*1/3, cpslist[2]['w'], RIGHT)
+    track.addCheckPointInRect(cpslist[3]['x'] + cpslist[3]['l'], cpslist[3]['y'], cpslist[4]['w']*1/3, cpslist[3]['w'], RIGHT)
+    track.addCheckPointInRect(cpslist[4]['x'], cpslist[3]['y'] + cpslist[3]['w']*2/3, cpslist[4]['w'], cpslist[3]['w']*1/3, DOWN)
+
+    return track
+
 
 def main():
     # set up pygame
@@ -355,29 +473,8 @@ def main():
     X0 = 50
     Y0 = 50
 
-    #set track
-    #counterclockwise
-    # cpslist = [ {'dir': DOWN,  'w': 80, 'l': 200},
-    #             {'dir': DOWN,  'w': 40, 'l': 200},
-    #             {'dir': RIGHT, 'w': 70, 'l': 160},
-    #             {'dir': RIGHT, 'w': 35, 'l': 160},
-    #             {'dir': UP,    'w': 60, 'l': 140},
-    #             {'dir': UP,    'w': 30, 'l': 140},
-    #             {'dir': LEFT,  'w': 40, 'l': 120},
-    #             {'dir': LEFT,  'w': 20, 'l': 120}]
-
-    # #clockwise
-    # cpslist = [ {'dir': RIGHT,  'w': 80, 'l': 200},
-    #             {'dir': RIGHT,  'w': 40, 'l': 200},
-    #             {'dir': DOWN, 'w': 70, 'l': 160},
-    #             {'dir': DOWN, 'w': 35, 'l': 160},
-    #             {'dir': LEFT,    'w': 60, 'l': 140},
-    #             {'dir': LEFT,    'w': 30, 'l': 140},
-    #             {'dir': UP,  'w': 40, 'l': 120},
-    #             {'dir': UP,  'w': 20, 'l': 120}]
-
     #create track
-    track = trackTemplate2(X0, Y0)
+    track = trackTemplate6(X0, Y0)
 
     while True:
         # check for the QUIT event
